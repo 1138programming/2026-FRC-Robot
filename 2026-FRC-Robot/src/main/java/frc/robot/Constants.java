@@ -16,4 +16,14 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class TurretConstants {
+    public static final double rotationMotorkP = 20.0;
+    public static final double rotationMotorkI = 0.0;
+    public static final double rotationMotorkD = 0.0;
+    public static final double rotationMotorOffSet = 0.0;
+    public static final double rotationMotorRightLim = 130.0;
+    public static final double rotationMotorLeftLim = 230.0;
+    
+  }
 }
