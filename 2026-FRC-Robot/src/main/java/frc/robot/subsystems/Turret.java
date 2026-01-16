@@ -23,7 +23,6 @@ public class Turret extends SubsystemBase {
     rotationMotor = new TalonFX(0);
     turretRotationCANcoder = new CANcoder(1);
     rotationMotorPID = new PIDController(rotationMotorkP, rotationMotorkI, rotationMotorkD);
-
     rotationMotorPID.enableContinuousInput(-1.0, 1.0);
   }
 
@@ -46,6 +45,7 @@ public class Turret extends SubsystemBase {
       rotateMotor(rotationMotorPID.calculate(getRotationDegree(), degrees));
     }
   }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
