@@ -5,15 +5,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.drive.Drive;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurretTracking extends Command {
+public class DriveStop extends Command {
+  /** Creates a new DriveStop. */
+  Drive drive;
 
-  Turret turret;
-  /** Creates a new TurrentTracking. */
-  public TurretTracking(Turret turret) {
-    this.turret = turret;
+  public DriveStop(Drive drive) {
+    this.drive = drive;
+    addRequirements(drive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -23,7 +24,9 @@ public class TurretTracking extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    drive.stop();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -32,6 +35,6 @@ public class TurretTracking extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

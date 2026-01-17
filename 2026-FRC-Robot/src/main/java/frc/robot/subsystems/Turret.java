@@ -4,21 +4,17 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.TurretConstants.*;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkBase.ControlType;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
-import static frc.robot.Constants.TurretConstants.*;
-
 public class Turret extends SubsystemBase {
-  //defining
+  // defining
   TalonFX rotationMotor;
   TalonFX hoodMotor;
   TalonFX flywheelMotor;
@@ -33,15 +29,14 @@ public class Turret extends SubsystemBase {
 
   /** Creates a new Turret. */
   public Turret() {
-    //Flywheel PID
+    // Flywheel PID
     var flywheelConfig = new Slot0Configs();
     flywheelConfig.kP = KflywheelMotorP;
     flywheelConfig.kI = KflywheelMotorI;
     flywheelConfig.kD = KflywheelMotorD;
     flywheelMotorRequest = new VelocityVoltage(0).withSlot(0);
 
-    
-    //constructors
+    // constructors
     flywheelMotor.getConfigurator().apply(flywheelConfig);
 
     rotationMotor = new TalonFX(KrotationMotorID);
@@ -53,31 +48,30 @@ public class Turret extends SubsystemBase {
 
     rotationMotorPID = new PIDController(KrotationMotorkP, KrotationMotorkI, KrotationMotorkD);
     hoodMotorPID = new PIDController(KhoodMotorkP, KhoodMotorkI, KhoodMotorkP);
-    
+
     rotationMotorPID.enableContinuousInput(-1.0, 1.0);
     hoodMotorPID.enableContinuousInput(-1.0, 1.0);
   }
 
+  // ==================== MOTOR ROTATIONS ====================
 
-  //==================== MOTOR ROTATIONS ====================
-
-  public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
+  public void rotateRotationMotor(double power) { // rotates the main rotation motor of the turret
     double rotationDegree = getRotationDegree();
-    //Make sure motor doesn't power when turret is outside of limits (0-270)
+    // Make sure motor doesn't power when turret is outside of limits (0-270)
     if (rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim) {
-      //hard stop if it's outside the 270 degrees
+      // hard stop if it's outside the 270 degrees
       rotationMotor.set(0.0);
       return;
     }
-    
+
     rotationMotor.set(power);
   }
 
-  //Make sure motor doesn't power when hood is outside of limits (TBD)
+  // Make sure motor doesn't power when hood is outside of limits (TBD)
 
   public void rotateHoodMotor(double power) {
     double hoodDegree = getHoodDegree();
-    //outside limits
+    // outside limits
     if (hoodDegree >= KhoodMotorRightLim && hoodDegree <= KhoodMotorLeftLim) {
       hoodMotor.set(0.0);
       return;
@@ -86,8 +80,7 @@ public class Turret extends SubsystemBase {
     hoodMotor.set(power);
   }
 
-
-  //==================== FLYWHEEL ====================
+  // ==================== FLYWHEEL ====================
 
   public void setFlyWheelVelocity(double velocity) {
     flywheelMotor.setControl(flywheelMotorRequest.withVelocity(velocity).withFeedForward(0.5));
@@ -97,17 +90,18 @@ public class Turret extends SubsystemBase {
     return flywheelMotor.getVelocity().getValueAsDouble();
   }
 
-  //==================== MOTOR DEGREES ====================
+  // ==================== MOTOR DEGREES ====================
 
-  public double getRotationDegree() { 
-    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset) * 360.0; //converts it to a degree
+  public double getRotationDegree() {
+    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset)
+        * 360.0; // converts it to a degree
   }
 
   public double getHoodDegree() {
     return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - KhoodMotorOffset) * 360;
   }
 
-  //==================== MOVE TO FUNCTIONS ====================
+  // ==================== MOVE TO FUNCTIONS ====================
 
   public void rotationMoveToPosition(double degrees) {
     double rotationDegree = getRotationDegree();
@@ -122,8 +116,6 @@ public class Turret extends SubsystemBase {
       rotateHoodMotor(hoodMotorPID.calculate(getHoodDegree(), degrees));
     }
   }
-  
-  
 
   @Override
   public void periodic() {
