@@ -4,33 +4,55 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkBase.ControlType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
 import static frc.robot.Constants.TurretConstants.*;
 
 public class Turret extends SubsystemBase {
   //defining
   TalonFX rotationMotor;
   TalonFX hoodMotor;
+  TalonFX flywheelMotor;
+
   CANcoder turretRotationCANcoder;
   CANcoder hoodPitchCANcoder;
+
   PIDController rotationMotorPID;
   PIDController hoodMotorPID;
+  PIDController flywheelMotorPID;
+  final VelocityVoltage flywheelMotorRequest;
 
   /** Creates a new Turret. */
   public Turret() {
-    //creation of everything
-    rotationMotor = new TalonFX(rotationMotorID);
-    hoodMotor = new TalonFX(hoodMotorID);
+    //Flywheel PID
+    var flywheelConfig = new Slot0Configs();
+    flywheelConfig.kP = KflywheelMotorP;
+    flywheelConfig.kI = KflywheelMotorI;
+    flywheelConfig.kD = KflywheelMotorD;
+    flywheelMotorRequest = new VelocityVoltage(0).withSlot(0);
 
-    turretRotationCANcoder = new CANcoder(turretRotationCANcoderID);
-    hoodPitchCANcoder = new CANcoder(hoodPitchCANcoderID);
+    
+    //constructors
+    flywheelMotor.getConfigurator().apply(flywheelConfig);
 
-    rotationMotorPID = new PIDController(rotationMotorkP, rotationMotorkI, rotationMotorkD);
-    hoodMotorPID = new PIDController(hoodMotorkP, hoodMotorkI, hoodMotorkP);
+    rotationMotor = new TalonFX(KrotationMotorID);
+    hoodMotor = new TalonFX(KhoodMotorID);
+    flywheelMotor = new TalonFX(KflywheelMotorID);
+
+    turretRotationCANcoder = new CANcoder(KturretRotationCANcoderID);
+    hoodPitchCANcoder = new CANcoder(KhoodPitchCANcoderID);
+
+    rotationMotorPID = new PIDController(KrotationMotorkP, KrotationMotorkI, KrotationMotorkD);
+    hoodMotorPID = new PIDController(KhoodMotorkP, KhoodMotorkI, KhoodMotorkP);
     
     rotationMotorPID.enableContinuousInput(-1.0, 1.0);
     hoodMotorPID.enableContinuousInput(-1.0, 1.0);
@@ -38,10 +60,11 @@ public class Turret extends SubsystemBase {
 
 
   //==================== MOTOR ROTATIONS ====================
+
   public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
     double rotationDegree = getRotationDegree();
     //Make sure motor doesn't power when turret is outside of limits (0-270)
-    if (rotationDegree >= rotationMotorRightLim && rotationDegree <= rotationMotorLeftLim) {
+    if (rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim) {
       //hard stop if it's outside the 270 degrees
       rotationMotor.set(0.0);
       return;
@@ -54,39 +77,54 @@ public class Turret extends SubsystemBase {
 
   public void rotateHoodMotor(double power) {
     double hoodDegree = getHoodDegree();
-    if (hoodDegree >= hoodMotorRightLim && hoodDegree <= hoodMotorLeftLim) {
+    //outside limits
+    if (hoodDegree >= KhoodMotorRightLim && hoodDegree <= KhoodMotorLeftLim) {
       hoodMotor.set(0.0);
+      return;
     }
-    hoodMotor.set(0.0);
+
+    hoodMotor.set(power);
   }
 
 
+  //==================== FLYWHEEL ====================
+
+  public void setFlyWheelVelocity(double velocity) {
+    flywheelMotor.setControl(flywheelMotorRequest.withVelocity(velocity).withFeedForward(0.5));
+  }
+
+  public double getFlywheelMotorVelocity() {
+    return flywheelMotor.getVelocity().getValueAsDouble();
+  }
+
   //==================== MOTOR DEGREES ====================
+
   public double getRotationDegree() { 
-    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - rotationMotorOffset) * 360.0; //converts it to a degree
+    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset) * 360.0; //converts it to a degree
   }
 
   public double getHoodDegree() {
-    return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - hoodMotorOffset) * 360;
+    return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - KhoodMotorOffset) * 360;
   }
 
   //==================== MOVE TO FUNCTIONS ====================
+
   public void rotationMoveToPosition(double degrees) {
     double rotationDegree = getRotationDegree();
-    if (!(rotationDegree >= rotationMotorRightLim && rotationDegree <= rotationMotorLeftLim)) {
+    if (!(rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim)) {
       rotateRotationMotor(rotationMotorPID.calculate(getRotationDegree(), degrees));
     }
   }
 
   public void hoodMoveToPosition(double degrees) {
     double hoodDegree = getHoodDegree();
-    if (hoodDegree >= hoodMotorRightLim && hoodDegree <= hoodMotorLeftLim) {
+    if (hoodDegree >= KhoodMotorRightLim && hoodDegree <= KhoodMotorLeftLim) {
       rotateHoodMotor(hoodMotorPID.calculate(getHoodDegree(), degrees));
     }
   }
   
   
-  //==================== PERIODIC ====================
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

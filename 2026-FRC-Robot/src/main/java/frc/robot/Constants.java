@@ -18,27 +18,32 @@ public final class Constants {
   }
 
   public static class TurretConstants {
-    public static final double rotationMotorkP = 20.0;
-    public static final double rotationMotorkI = 0.0;
-    public static final double rotationMotorkD = 0.0;
+    public static final double KrotationMotorkP = 20.0;
+    public static final double KrotationMotorkI = 0.0;
+    public static final double KrotationMotorkD = 0.0;
 
-    public static final double hoodMotorkP = 20.0;
-    public static final double hoodMotorkI = 0.0;
-    public static final double hoodMotorkD = 0.0;
+    public static final double KhoodMotorkP = 20.0;
+    public static final double KhoodMotorkI = 0.0;
+    public static final double KhoodMotorkD = 0.0;
 
-    public static final double rotationMotorOffset = 0.0;
-    public static final double hoodMotorOffset = 0.0;
+    public static final double KflywheelMotorP = 2.4;
+    public static final double KflywheelMotorI = 0.0;
+    public static final double KflywheelMotorD = 0.1;
 
-    public static final double rotationMotorRightLim = 130.0;
-    public static final double rotationMotorLeftLim = 230.0;
-    public static final double hoodMotorRightLim = 90.0;
-    public static final double hoodMotorLeftLim = 0.0;
+    public static final double KrotationMotorOffset = 0.0;
+    public static final double KhoodMotorOffset = 0.0;
 
-    public static final int rotationMotorID = 0;
-    public static final int hoodMotorID = 2;
+    public static final double KrotationMotorRightLim = 130.0;
+    public static final double KrotationMotorLeftLim = 230.0;
+    public static final double KhoodMotorRightLim = 90.0;
+    public static final double KhoodMotorLeftLim = 0.0;
 
-    public static final int turretRotationCANcoderID = 1;
-    public static final int hoodPitchCANcoderID = 3;
+    public static final int KrotationMotorID = 0;
+    public static final int KhoodMotorID = 2;
+    public static final int KflywheelMotorID = 4;
+
+    public static final int KturretRotationCANcoderID = 1;
+    public static final int KhoodPitchCANcoderID = 3;
     
   }
 }
