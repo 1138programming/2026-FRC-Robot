@@ -21,9 +21,24 @@ public final class Constants {
     public static final double rotationMotorkP = 20.0;
     public static final double rotationMotorkI = 0.0;
     public static final double rotationMotorkD = 0.0;
-    public static final double rotationMotorOffSet = 0.0;
+
+    public static final double hoodMotorkP = 20.0;
+    public static final double hoodMotorkI = 0.0;
+    public static final double hoodMotorkD = 0.0;
+
+    public static final double rotationMotorOffset = 0.0;
+    public static final double hoodMotorOffset = 0.0;
+
     public static final double rotationMotorRightLim = 130.0;
     public static final double rotationMotorLeftLim = 230.0;
+    public static final double hoodMotorRightLim = 90.0;
+    public static final double hoodMotorLeftLim = 0.0;
+
+    public static final int rotationMotorID = 0;
+    public static final int hoodMotorID = 2;
+
+    public static final int turretRotationCANcoderID = 1;
+    public static final int hoodPitchCANcoderID = 3;
     
   }
 }
