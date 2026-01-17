@@ -91,6 +91,14 @@ public class Limelight extends SubsystemBase {
     ty = LimelightOneTable.getEntry("ty").getDouble(0);  
     Area = LimelightOneTable.getEntry("ta").getDouble(0); 
     ID = LimelightOneTable.getEntry("tid").getDouble(0);  
+    
+
+   Area = LimelightOneTable.getEntry("TA").getDouble(0); 
+   ID = LimelightOneTable.getEntry("TID").getDouble(0);  
+   
+   LimelightOneTable.getEntry("TID").getDoubleArray(new double[11]);
+
+   //botPose = LimelightOneTable.getEntry("botpose_wpiblue").getDoubleArray(new double[61]);
 
     if (botpose.length != 0) {
       botPoseX = botpose[0];
@@ -244,8 +252,12 @@ public class Limelight extends SubsystemBase {
     return new Pose3d(getBotPoseX(), getBotPoseY(), getBotPoseZ(), rot3d);
   }
 
+//botpose
+public double[] getBotPose() {
+    return botpose;
+  }
 }
-  
+
 
 
 
