@@ -16,4 +16,17 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class LimelightConstants {
+    public static class TagConstants {
+      public static class IDConstants {
+
+      }
+
+      public static class OffsetConstants {
+        public static final double kX_HubCenterTagtoHubCenterMeters = -0.5969;
+        public static final double kY_HubCenterTagtoHubScoreHeightMeters = 0.70485;
+      }
+    }
+  }
 }
