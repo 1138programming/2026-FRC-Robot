@@ -212,7 +212,7 @@ public class Limelight extends SubsystemBase {
   //specific offset getters for FRC 2026 april tags - these are specific values to the game 
 
   /**
-   * Returns the Tx offset from the central hub tag offset to calculate angle to the middle point of the hub's entrance.
+   * Returns the Tx offset from the central hub tag offset to calculate angle to the middle point of the hub's entrance. Used for aiming and projectile motion calculations for shooting fuel into hub.
    * Assumes that the targeted point of interest is an april tag centered on the hub (ex. ID 10 for red, ID 26 for blue)
    * @apiNote Forward offset: -0.5969 meters,  Height offset: 0.70485 meters
    * @return Tx with offset (degrees)
@@ -225,7 +225,7 @@ public class Limelight extends SubsystemBase {
   }
 
    /**
-   * Returns the Tx offset from the central hub tag offset to calculate angle to the middle point of the hub's entrance.
+   * Returns the Tx offset from the central hub tag offset to calculate angle to the middle point of the hub's entrance. Used for aiming and projectile motion calculations for shooting fuel into hub.
    * Assumes that the targeted point of interest is an april tag centered on the hub (ex. ID 10 for red, ID 26 for blue)
    * @apiNote Forward offset: -0.5969 meters,  Height offset: 0.70485 meters
    * @return Ty with offset (degrees)
