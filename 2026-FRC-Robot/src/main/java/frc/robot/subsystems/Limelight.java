@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.LimelightHelpers;
@@ -51,6 +52,9 @@ public class Limelight extends SubsystemBase {
     //other 
     private double latency;
     private int isTargetsDetected;
+
+    private final DoubleArrayPublisher orientationPublisher;
+    private final DoubleArrayPublisher filterPublisher;
   
 
    
@@ -80,6 +84,9 @@ public class Limelight extends SubsystemBase {
 
     priorityID = -1;
     //LimelightOneTable.getEntry("priorityid").setNumber(priorityID);
+    orientationPublisher = LimelightOneTable.getDoubleArrayTopic("robot_orientation_set").publish();
+    filterPublisher =    LimelightOneTable.getDoubleArrayTopic("fiducial_id_filters_set").publish();
+
 
   //stores the data for the LL
   }
@@ -97,6 +104,11 @@ public class Limelight extends SubsystemBase {
    ID = LimelightOneTable.getEntry("TID").getDouble(0);  
    
    LimelightOneTable.getEntry("TID").getDoubleArray(new double[11]);
+
+
+   filterPublisher.accept(new double[]{3,4});
+
+
 
    //botPose = LimelightOneTable.getEntry("botpose_wpiblue").getDoubleArray(new double[61]);
 
