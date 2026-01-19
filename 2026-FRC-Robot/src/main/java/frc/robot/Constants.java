@@ -131,5 +131,19 @@ public final class Constants {
 
     public static final int KturretRotationCANcoderID = 1;
     public static final int KhoodPitchCANcoderID = 3;
+  
+
+  }
+  public static class LimelightConstants {
+    public static class TagConstants {
+      public static class IDConstants {
+
+      }
+
+      public static class OffsetConstants {
+        public static final double kX_HubCenterTagtoHubCenterMeters = -0.5969;
+        public static final double kY_HubCenterTagtoHubScoreHeightMeters = 0.70485;
+      }
+    }
   }
 }
