@@ -44,6 +44,9 @@ public final class Constants {
 
     public static final int KturretRotationCANcoderID = 1;
     public static final int KhoodPitchCANcoderID = 3;
+  }
     
+  public static class LaserConstants {
+    public static final int kLaserDIOPort = 3;
   }
 }
