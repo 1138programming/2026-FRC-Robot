@@ -132,7 +132,7 @@ public final class Constants {
     public static final int KturretRotationCANcoderID = 1;
     public static final int KhoodPitchCANcoderID = 3;
 
-    public static final double kHoodAngleMinRadians = Math.toRadians(.0);
+    public static final double kHoodAngleMinRadians = Math.toRadians(20.0);
     public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
   
 
