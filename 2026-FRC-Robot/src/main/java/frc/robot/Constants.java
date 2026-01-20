@@ -131,6 +131,9 @@ public final class Constants {
 
     public static final int KturretRotationCANcoderID = 1;
     public static final int KhoodPitchCANcoderID = 3;
+
+    public static final double kHoodAngleMinRadians = Math.toRadians(20.0);
+    public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
   
 
   }
@@ -150,22 +153,18 @@ public final class Constants {
     
   public static class LaserConstants {
     public static final int kLaserDIOPort = 3;
+  }
 
-    public static class ShooterLogicConstants {
-      public static final double kFlywheelSpeedMaxRPM = 5000.0;
-      public static final double kFlywheelSpeedMinRPM = 1000.0; 
-    }
+  public static class ShooterLogicConstants {
+    public static final double kFlywheelSpeedMaxRPM = 5000.0;
+    public static final double kFlywheelSpeedMinRPM = 1000.0; 
+  }
 
-    public static class TurretConstants {
-      public static final double kHoodAngleMinRadians = Math.toRadians(20.0);
-      public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
-    }
 
-    public static class FieldConstants {
-      public static final double kHubHeight = 1.8288; //meters
-      public static final double kScoreHeight = kHubHeight - 0.5588; //meters (shooter height is 0.5588m temporary)
-      public static final double kScoreAngle = Math.toRadians(35); //radians
-      public static final double kPassThroughPointRadius = 0.6096; //meters
-    }
+  public static class FieldConstants {
+    public static final double kHubHeight = 1.8288; //meters
+    public static final double kScoreHeight = kHubHeight - 0.5588; //meters (shooter height is 0.5588m temporary)
+    public static final double kScoreAngle = Math.toRadians(35); //radians
+    public static final double kPassThroughPointRadius = 0.6096; //meters
   }
 }
