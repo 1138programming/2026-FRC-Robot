@@ -155,16 +155,15 @@ public final class Constants {
     public static final int kLaserDIOPort = 3;
   }
 
-  public static class ShooterLogicConstants {
-    public static final double kFlywheelSpeedMaxRPM = 5000.0;
-    public static final double kFlywheelSpeedMinRPM = 1000.0; 
-  }
-
-
   public static class FieldConstants {
     public static final double kHubHeight = 1.8288; //meters
     public static final double kScoreHeight = kHubHeight - 0.5588; //meters (shooter height is 0.5588m temporary)
     public static final double kScoreAngle = Math.toRadians(35); //radians
     public static final double kPassThroughPointRadius = 0.6096; //meters
+
+    public static class TagIDConstants {
+      public static final int kHubCenterTagRed = 10;
+      public static final int kHubCenterTagBlue = 26;
+    }
   }
 }

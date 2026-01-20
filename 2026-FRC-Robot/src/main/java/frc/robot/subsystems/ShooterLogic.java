@@ -12,10 +12,8 @@ import java.util.Vector;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Limelight;
 import frc.robot.Constants;
-import static frc.robot.Constants.TurretConstants;
-import static frc.robot.Constants.ShooterLogicCons;
+import static frc.robot.Constants.TurretConstants.*;
 import static frc.robot.Constants.FieldConstants.*;
-import static frc.robot.Constants.
 
 public class ShooterLogic extends SubsystemBase {
   /** Creates a new ShooterLogic. */
