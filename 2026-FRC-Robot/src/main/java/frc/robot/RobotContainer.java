@@ -1,3 +1,4 @@
+
 // Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
@@ -300,26 +301,24 @@ public final TurretTracking m_Turret_Tracking;
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> getLogiLeftYAxis() * 0.75,
+            () -> getLogiLeftXAxis() * 0.75,
+            () -> getLogiRightXAxis() * 0.75));
 
     // Lock to 0° when A button is held
-    controller
-        .a()
+    logitechBtnA
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
+                () -> getLogiLeftYAxis(),
+                () -> getLogiLeftXAxis(),
                 () -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
+    logitechBtnA
         .onTrue(
             Commands.runOnce(
                     () ->
