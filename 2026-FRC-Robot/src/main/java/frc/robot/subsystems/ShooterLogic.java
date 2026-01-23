@@ -40,7 +40,7 @@ public class ShooterLogic extends SubsystemBase {
    */
   public double[] calculateShotChanges(double robotHeading) {
 
-    final double g = 32.174 * 12;
+    final double g = 9.81;
     double x = limelight.getHubCenterTagtoOffsetHubCenterDistancetoCamera() - kPassThroughPointRadius; //could be alternatively used using Pose
     double y = kScoreHeight; //could be alternatively used using Pose
     double a = kScoreAngle;
@@ -49,18 +49,18 @@ public class ShooterLogic extends SubsystemBase {
     double hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(2 * y / x - Math.tan(a))))); //this clamps the hood angle to constraints
     double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - y)));
 
-    //robot velocity components
-    double robotVelcity = drive.getFFCharacterizationVelocity();
+    //robot velocity components -> TODO, check video to see if this matches up
+    double robotVelocity = drive.getFFCharacterizationVelocity(); //TODO: probably get the velocity from the IMU, also check units  
     double robotAngle = drive.getPose().getRotation().getRadians();
-    double robotVelocityXComponent = robotVelcity * Math.cos(robotAngle);
-    double robotVelocityYComponent = robotVelcity * Math.sin(robotAngle);
+    double robotVelocityXComponent = robotVelocity * Math.cos(robotAngle);
+    double robotVelocityYComponent = robotVelocity * Math.sin(robotAngle);
 
     //velocity compensation variables
-    double vz = flywheelSpeed * Math.sin(hoodAngle);
-    double time = x / (flywheelSpeed * Math.cos(hoodAngle));
-    double ivr = x / time + robotVelocityXComponent;
-    double nvr = Math.sqrt(ivr * ivr + robotVelocityYComponent * robotVelocityYComponent);
-    double ndr = nvr * time;
+    double vz = flywheelSpeed * Math.sin(hoodAngle); //velocity of the projectile in z direction (vertical)
+    double time = x / (flywheelSpeed * Math.cos(hoodAngle)); //projectile air time
+    double ivr = x / time + robotVelocityXComponent; //initial radial velocity of of the projectile
+    double nvr = Math.sqrt(ivr * ivr + robotVelocityYComponent * robotVelocityYComponent); //compensating launch velocity using perpendicular moevement 
+    double ndr = nvr * time; //convert to distance
 
     //final launch components with compensation
     hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(vz / nvr))));
@@ -70,6 +70,7 @@ public class ShooterLogic extends SubsystemBase {
     double turretVelCompensation = Math.atan(robotVelocityYComponent / ivr);
     double turretAngle = (robotHeading - robotAngle + turretVelCompensation);
 
+  
     if (turretAngle > Math.toRadians(180)) {
       turretAngle -= Math.toRadians(360);
     }
