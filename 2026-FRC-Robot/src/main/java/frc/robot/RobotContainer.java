@@ -318,7 +318,7 @@ public final TurretTracking m_Turret_Tracking;
     logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
-    logitechBtnA
+    logitechBtnY
         .onTrue(
             Commands.runOnce(
                     () ->

@@ -126,9 +126,9 @@ public class TunerConstants {
 
 
     // Front Left
-    private static final int kFrontLeftDriveMotorId = 7;
-    private static final int kFrontLeftSteerMotorId = 2;
-    private static final int kFrontLeftEncoderId = 5;
+    private static final int kFrontLeftDriveMotorId = 2;
+    private static final int kFrontLeftSteerMotorId = 1;
+    private static final int kFrontLeftEncoderId = 1;
     private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.00390625);
     private static final boolean kFrontLeftSteerMotorInverted = true;
     private static final boolean kFrontLeftEncoderInverted = false;
@@ -139,7 +139,7 @@ public class TunerConstants {
     // Front Right
     private static final int kFrontRightDriveMotorId = 4;
     private static final int kFrontRightSteerMotorId = 3;
-    private static final int kFrontRightEncoderId = 6;
+    private static final int kFrontRightEncoderId = 2;
     private static final Angle kFrontRightEncoderOffset = Rotations.of(0.427490234375);
     private static final boolean kFrontRightSteerMotorInverted = true;
     private static final boolean kFrontRightEncoderInverted = false;
@@ -149,7 +149,7 @@ public class TunerConstants {
 
     // Back Left
     private static final int kBackLeftDriveMotorId = 6;
-    private static final int kBackLeftSteerMotorId = 0;
+    private static final int kBackLeftSteerMotorId = 5;
     private static final int kBackLeftEncoderId = 3;
     private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.422119140625);
     private static final boolean kBackLeftSteerMotorInverted = true;
@@ -160,7 +160,7 @@ public class TunerConstants {
 
     // Back Right
     private static final int kBackRightDriveMotorId = 8;
-    private static final int kBackRightSteerMotorId = 1;
+    private static final int kBackRightSteerMotorId = 7;
     private static final int kBackRightEncoderId = 4;
     private static final Angle kBackRightEncoderOffset = Rotations.of(0.494140625);
     private static final boolean kBackRightSteerMotorInverted = true;
