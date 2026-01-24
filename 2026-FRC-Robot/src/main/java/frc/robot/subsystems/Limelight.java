@@ -270,6 +270,7 @@ public class Limelight extends SubsystemBase {
         return distToCamera;
       }
     }
+    resetFiducial3DOffset();
     return -1.0; //default value, no specified ID found. 
   }
 
@@ -286,6 +287,7 @@ public class Limelight extends SubsystemBase {
         return distToRobot;
       }
     }
+    resetFiducial3DOffset();
     return -1.0; //default value, no specified ID found. 
   }
 
