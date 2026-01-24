@@ -137,7 +137,8 @@ public final class Constants {
   public static class LimelightConstants {
     public static class TagConstants {
       public static class IDConstants {
-
+        public static final int kHubCenterTagBlue = 26;
+        public static final int kHubCenterTagRed = 10;
       }
 
       public static class OffsetConstants {
