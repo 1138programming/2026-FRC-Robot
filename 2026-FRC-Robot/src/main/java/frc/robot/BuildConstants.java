@@ -13,6 +13,12 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "Odom-Testing";
   public static final String BUILD_DATE = "2026-01-22 21:02:30 EST";
   public static final long BUILD_UNIX_TIME = 1769133750072L;
+  public static final int GIT_REVISION = 24;
+  public static final String GIT_SHA = "27be7943d182bbc050ff965ce6155521dfbfbb77";
+  public static final String GIT_DATE = "2026-01-19 19:18:07 EST";
+  public static final String GIT_BRANCH = "main";
+  public static final String BUILD_DATE = "2026-01-20 01:36:00 EST";
+  public static final long BUILD_UNIX_TIME = 1768890960170L;
   public static final int DIRTY = 1;
 
   private BuildConstants(){}
