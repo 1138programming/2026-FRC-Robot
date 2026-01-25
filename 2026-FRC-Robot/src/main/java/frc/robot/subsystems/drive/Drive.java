@@ -218,6 +218,7 @@ public class Drive extends SubsystemBase {
     limelight.updateOreintation(poseEstimator.getEstimatedPosition().getRotation().getDegrees());
     boolean isUsingVision = updateOdometryWithMT2();
     SmartDashboard.putBoolean("isUsingVision", isUsingVision);
+    SmartDashboard.putString("drive pose estimater", poseEstimator.getEstimatedPosition().toString()) ;
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);

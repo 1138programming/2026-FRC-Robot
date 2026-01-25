@@ -3,6 +3,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -85,7 +86,7 @@ public class Limelight extends SubsystemBase {
       tagSpan = botpose[8];
       averageDistance = botpose[9];
       Area = botpose[10];
-      ID = botpose[11];
+      //ID = botpose[11];
 
     }
 
@@ -131,9 +132,13 @@ public class Limelight extends SubsystemBase {
       tagSpan = botpose[8];
       averageDistance = botpose[9];
       Area = botpose[10];
-      ID = botpose[11];
+      //ID = botpose[11];
 
     }
+
+    //smart dashboarrd
+    SmartDashboard.putNumber("distance to center hub top", getHubCenterTagtoOffsetHubCenterDistancetoCamera());
+
     
   }
 
@@ -261,15 +266,18 @@ public class Limelight extends SubsystemBase {
   }
 
   /**
+   * 
    * Calculates the distance from the limelight to the middle point of the hub's entrance and returns it.
    * Used to calculate any other distance values as a hypotoneuse
    * 
    * @return Distance to middle point hub entrance (meters), -1.0 if Hub center tag not found
+   * @deprecated Use pose 3d to calculte distances
+   * 
    * 
    */
   public double getHubCenterTagtoOffsetHubCenterDistancetoCamera() {
     setFiducial3DOffset(kX_HubCenterTagtoHubCenterMeters, 0, kY_HubCenterTagtoHubScoreHeightMeters);
-    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
     for (LimelightHelpers.RawFiducial fiducial : fiducials) {
       int id = fiducial.id;                    // Tag ID
       double distToCamera = fiducial.distToCamera;  // Distance to camera
@@ -280,12 +288,15 @@ public class Limelight extends SubsystemBase {
         return distToCamera;
       }
     }
+    resetFiducial3DOffset();
     return -1.0; //default value, no specified ID found. 
   }
-
+  /** 
+  * @deprecated Use pose 3d to calculte distances
+  */
   public double getHubCenterTagtoOffsetHubCenterDistancetoRobot() {
     setFiducial3DOffset(kX_HubCenterTagtoHubCenterMeters, 0, kY_HubCenterTagtoHubScoreHeightMeters);
-    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
     for (LimelightHelpers.RawFiducial fiducial : fiducials) {
       int id = fiducial.id;                    // Tag ID
       double distToRobot = fiducial.distToRobot;  // Distance to camera
@@ -296,6 +307,7 @@ public class Limelight extends SubsystemBase {
         return distToRobot;
       }
     }
+    resetFiducial3DOffset();
     return -1.0; //default value, no specified ID found. 
   }
 
@@ -336,6 +348,10 @@ public class Limelight extends SubsystemBase {
 
   public boolean existsVisionData() {
     LimelightHelpers.PoseEstimate mt2 = getPoseEstimateMT2();
+    SmartDashboard.putBoolean("VisionDataExists", (mt2 != null && mt2.tagCount != 0));
+    if (mt2 != null) {
+      SmartDashboard.putNumber("vision tag count", mt2.tagCount);
+    }
     return (mt2 != null && mt2.tagCount != 0);
   }
 
