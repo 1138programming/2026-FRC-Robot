@@ -135,6 +135,8 @@ public final class Constants {
 
   }
   public static class LimelightConstants {
+
+    public static final String kLimelightName = "limelight_down";
     public static class TagConstants {
       public static class IDConstants {
         public static final int kHubCenterTagBlue = 26;

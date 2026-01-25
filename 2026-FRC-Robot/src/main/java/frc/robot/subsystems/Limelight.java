@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -12,6 +13,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.LimelightHelpers;
 
 import static frc.robot.Constants.LimelightConstants.TagConstants.OffsetConstants.*;
+
+import java.util.function.Supplier;
+
 import static frc.robot.Constants.LimelightConstants.TagConstants.IDConstants.*;
 
 //import static frc.robot.Constants.LimelightConstants.*;
@@ -56,13 +60,15 @@ public class Limelight extends SubsystemBase {
 
     private final DoubleArrayPublisher orientationPublisher;
     private final DoubleArrayPublisher filterPublisher;
+    //private final Supplier<Rotation2d> rotationalSupplier;
   
 
    
 
   public Limelight(String limelightName) {
     
-    this.limelightName = limelightName; //should be instatialized with a constant value passed 
+    this.limelightName = limelightName; //should be instatialized with a constant value passed
+    //this.rotationalSupplier = rotationalSupplier; 
     LimelightOneTable = NetworkTableInstance.getDefault().getTable("limelight");
 
     botpose = LimelightOneTable.getEntry("botpose_wpiblue").getDoubleArray(new double[11]);
@@ -297,6 +303,7 @@ public class Limelight extends SubsystemBase {
     return isTargetsDetected;
   }
   
+
   //Limelight Pose 3D compilation 
   /**
    * Compiles the Limelight botpose_wpiblue array into a Pose3d object
@@ -308,10 +315,41 @@ public class Limelight extends SubsystemBase {
     return new Pose3d(getBotPoseX(), getBotPoseY(), getBotPoseZ(), rot3d);
   }
 
-//botpose
-public double[] getBotPose() {
+  //botpose
+  public double[] getBotPose() {
     return botpose;
   }
+
+  public void updateOreintation(double degrees) {
+    LimelightHelpers.SetRobotOrientation(limelightName, degrees, 0,0,0,0,0);
+  }
+
+  /**
+   * Get robot positional data using MegaTag2. 
+   * 
+   * @apiNote must be called in a periodic function so robot oreintation is continously
+   * @return
+   */
+  private LimelightHelpers.PoseEstimate getPoseEstimateMT2() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+  }
+
+  public boolean existsVisionData() {
+    LimelightHelpers.PoseEstimate mt2 = getPoseEstimateMT2();
+    return (mt2 != null && mt2.tagCount != 0);
+  }
+
+  public Pose2d getMT2Pose() {
+    return getPoseEstimateMT2().pose;
+  }
+
+  public double getMT2Time() {
+    return getPoseEstimateMT2().timestampSeconds;
+  }
+
+
+
+  
 }
 
 
