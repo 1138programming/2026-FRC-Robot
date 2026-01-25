@@ -23,8 +23,12 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -222,6 +226,9 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    SmartDashboard.putNumber("meters to center hub", distanetoCenterHub());
+
+
   }
 
   //extra periodic methods
@@ -383,5 +390,24 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  public Pose3d turretPositionPose3d() {
+    Rotation3d currentRotation = new Rotation3d(getRotation());
+    Pose3d currentPose = new Pose3d(poseEstimator.getEstimatedPosition().getX(),poseEstimator.getEstimatedPosition().getY(), 0.0, currentRotation);
+    
+    Translation3d translationOffset = new Translation3d(14, 14, 0);
+    Rotation3d rotationOffset = new Rotation3d(0,0,0);
+    Transform3d offsetTransformation = new Transform3d(translationOffset, rotationOffset);
+
+    return currentPose.plus(offsetTransformation);
+  }
+
+  public double distanetoCenterHub() {
+    Pose3d currentPose = turretPositionPose3d();
+    
+    Pose3d hubCenterTop = new Pose3d(4.625594, 4.034536, 1.8288, new Rotation3d());
+    double distance = currentPose.getTranslation().getDistance(hubCenterTop.getTranslation());
+    return distance;
   }
 }
