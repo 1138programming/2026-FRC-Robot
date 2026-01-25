@@ -76,8 +76,8 @@ public class Turret extends SubsystemBase {
 
 
   //==================== MOTOR ROTATIONS ====================
-// ts is all courtesy of ian anay and justin pls dont hurt us
-// idk buh figure it out
+  //Maybe put in periodic?
+  //Also  CanRotatedDegrees/55 = the current turret degree
   double previousDegree = getRotationDegree();
   double CANRotatedDegrees = 0.0;
   double currentDegree;
