@@ -10,7 +10,6 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,7 +34,11 @@ public class Turret extends SubsystemBase {
   final VelocityVoltage flywheelMotorRequest;
   DigitalInput leftLimSwitch;
   DigitalInput rightLimSwitch;
-  static int counter;
+
+  double previousDegree = getRotationDegree();
+  static double CANRotatedDegrees = 0.0;
+  double currentDegree;
+  double currentRotationPower;
   
   /** Creates a new Turret. */
   public Turret() {
@@ -79,14 +82,20 @@ public class Turret extends SubsystemBase {
   //==================== MOTOR ROTATIONS ====================
   //Maybe put in periodic?
   //Also  CanRotatedDegrees/55 = the current turret degree
-  double previousDegree = getRotationDegree();
-  double CANRotatedDegrees = 0.0;
-  double currentDegree;
-  double currentRotationPower;
 
   public void updateTurretDeg() {
     currentDegree = getRotationDegree();
     currentRotationPower = getRotationMotorPower();
+
+    if (getLeftLimitSwitchVal()) {
+      CANRotatedDegrees = KrotationMotorLeftLim * kturretRotationstoMotorRotationCount;
+      return;
+    }
+
+    if (getRightLimitSwitchVal()){
+      CANRotatedDegrees = KrotationMotorRightLim * kturretRotationstoMotorRotationCount;
+      return;
+    }
 
     if (currentRotationPower == 0) return;
 
@@ -107,17 +116,20 @@ public class Turret extends SubsystemBase {
   }
 
   public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
-
-    double rotationDegree = getRotationDegree();
+    updateTurretDeg();
+    double rotationDegree = getTurretRotationInDegrees();
     //Make sure motor doesn't power when turret is outside of limits (0-270)
     if (rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim) {
-      //hard stop if it's outside the 270 degrees
+      //hard stop 
       rotationMotor.set(0.0);
       return;
     }
     
     rotationMotor.set(power);
   }
+
+
+  
 
 
   //Make sure motor doesn't power when hood is outside of limits (TBD)
@@ -133,6 +145,9 @@ public class Turret extends SubsystemBase {
     hoodMotor.set(power);
   }
 
+  public double getTurretRotationInDegrees(){
+    return CANRotatedDegrees / kturretRotationstoMotorRotationCount;
+  }
 
   //==================== FLYWHEEL ====================
 
@@ -178,6 +193,9 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("rotation", getRotationDegree());
+    SmartDashboard.putNumber("rotation of motor", getRotationDegree());
+    SmartDashboard.putNumber("rotation of turret",getTurretRotationInDegrees());
+    SmartDashboard.putBoolean("Left lim switch", getLeftLimitSwitchVal());
+    SmartDashboard.putBoolean("Right lim switch", getRightLimitSwitchVal());
   }
 }

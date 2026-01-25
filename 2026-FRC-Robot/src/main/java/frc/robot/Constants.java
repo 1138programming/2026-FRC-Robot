@@ -47,6 +47,8 @@ public final class Constants {
 
     public static final int KleftLimSwitchID = 7;
     public static final int KrightLimSwitchID = 8;
+
+    public static final double kturretRotationstoMotorRotationCount = 55;
   }
     
   public static class LaserConstants {
