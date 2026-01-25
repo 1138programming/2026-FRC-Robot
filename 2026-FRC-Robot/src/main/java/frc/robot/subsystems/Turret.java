@@ -8,8 +8,11 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ControlType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +22,7 @@ import static frc.robot.Constants.TurretConstants.*;
 
 public class Turret extends SubsystemBase {
   //defining
-  TalonFX rotationMotor;
+  SparkMax rotationMotor;
   TalonFX hoodMotor;
   TalonFX flywheelMotor;
 
@@ -30,7 +33,9 @@ public class Turret extends SubsystemBase {
   PIDController hoodMotorPID;
   PIDController flywheelMotorPID;
   final VelocityVoltage flywheelMotorRequest;
-
+  DigitalInput leftLimSwitch;
+  DigitalInput rightLimSwitch;
+  static int counter;
   /** Creates a new Turret. */
   public Turret() {
     //Flywheel PID
@@ -44,7 +49,7 @@ public class Turret extends SubsystemBase {
     //constructors
     flywheelMotor.getConfigurator().apply(flywheelConfig);
 
-    rotationMotor = new TalonFX(KrotationMotorID);
+    rotationMotor = new SparkMax(KrotationMotorID, MotorType.kBrushless);
     hoodMotor = new TalonFX(KhoodMotorID);
     flywheelMotor = new TalonFX(KflywheelMotorID);
 
@@ -56,12 +61,52 @@ public class Turret extends SubsystemBase {
     
     rotationMotorPID.enableContinuousInput(-1.0, 1.0);
     hoodMotorPID.enableContinuousInput(-1.0, 1.0);
+
+    leftLimSwitch = new DigitalInput(KleftLimSwitchID);
+    rightLimSwitch = new DigitalInput(KrightLimSwitchID);
+  }
+
+  public boolean getLeftLimitSwitchVal(){
+    return leftLimSwitch.get();
+  }
+
+  public boolean getRightLimitSwitchVal(){
+    return rightLimSwitch.get();
   }
 
 
   //==================== MOTOR ROTATIONS ====================
+// ts is all courtesy of ian anay and justin pls dont hurt us
+// idk buh figure it out
+  double previousDegree = getRotationDegree();
+  double CANRotatedDegrees = 0.0;
+  double currentDegree;
+  double currentRotationPower;
+
+  public void updateTurretDeg() {
+    currentDegree = getRotationDegree();
+    currentRotationPower = getRotationMotorPower();
+
+    if (currentRotationPower == 0) return;
+
+    if (currentRotationPower > 0) { //assume going clockwise if true
+      if (currentDegree < previousDegree) { //did wrap around if true
+        CANRotatedDegrees += (360 - previousDegree) + currentDegree; //add wrapped around difference
+      } else {
+        CANRotatedDegrees += currentDegree - previousDegree; //didn't wrap around so just add difference
+      }
+    } else {
+      if (currentDegree > previousDegree){
+        CANRotatedDegrees += previousDegree + (360 - currentDegree);
+      } else {
+        CANRotatedDegrees += currentDegree - previousDegree;
+      }
+    }
+    previousDegree = currentDegree;
+  }
 
   public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
+
     double rotationDegree = getRotationDegree();
     //Make sure motor doesn't power when turret is outside of limits (0-270)
     if (rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim) {
@@ -72,6 +117,7 @@ public class Turret extends SubsystemBase {
     
     rotationMotor.set(power);
   }
+
 
   //Make sure motor doesn't power when hood is outside of limits (TBD)
 
@@ -100,11 +146,15 @@ public class Turret extends SubsystemBase {
   //==================== MOTOR DEGREES ====================
 
   public double getRotationDegree() { 
-    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset) * 360.0; //converts it to a degree
+    return ((turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset) * 180.0) + 180; //converts it to a degree
   }
 
   public double getHoodDegree() {
     return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - KhoodMotorOffset) * 360;
+  }
+
+  public double getRotationMotorPower(){
+    return rotationMotor.get();
   }
 
   //==================== MOVE TO FUNCTIONS ====================
