@@ -2,9 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import static frc.robot.Constants.SpindexerConstants.*;
-import static frc.robot.Constants.TurretConstants.KrightLimSwitchID;
-
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Spindexer extends SubsystemBase{
@@ -48,6 +47,7 @@ public class Spindexer extends SubsystemBase{
 
     @Override
     public void periodic(){
-        //blah blah blah
+        SmartDashboard.putBoolean("left lim", getLeftLimTriggered());
+        SmartDashboard.putBoolean("right lim", getRightLimTriggered());
     }
 }
