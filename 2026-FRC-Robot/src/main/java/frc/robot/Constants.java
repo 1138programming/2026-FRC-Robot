@@ -52,4 +52,12 @@ public final class Constants {
   public static class LaserConstants {
     public static final int kLaserDIOPort = 3;
   }
+
+  public static class SpindexerConstants {
+    public static final int KIndexMotorID = 67;
+    public static final int KRotationMotorID = 41;
+
+    public static final int KleftLimSwitchID = 6741;
+    public static final int KrightLimSwitchID = 4167;
+  }
 }
