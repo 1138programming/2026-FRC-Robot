@@ -134,6 +134,13 @@ public final class Constants {
   
 
   }
+
+  //Intake
+  public static final int KIntakeMotorReelId = 67;
+  public static final double KIntakeMotorReelSpeed = 0.67;
+
+
+
   public static class LimelightConstants {
     public static class TagConstants {
       public static class IDConstants {
