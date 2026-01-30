@@ -50,7 +50,13 @@ public final class Constants {
 
     public static final double kturretRotationstoMotorRotationCount = 55;
   }
-    
+  
+  public static class turretSpeedConstants {
+    public static final double KHoodMotorPower = 1.0;
+    public static final double KRotationMotorPower = 1.0;
+    public static final double KFlyWheelPower = 1.0;
+  }
+
   public static class LaserConstants {
     public static final int kLaserDIOPort = 3;
   }

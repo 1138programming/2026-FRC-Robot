@@ -39,6 +39,7 @@ public class Turret extends SubsystemBase {
   static double CANRotatedDegrees = 0.0;
   double currentDegree;
   double currentRotationPower;
+  double turretDegree;
   
   /** Creates a new Turret. */
   public Turret() {
@@ -80,9 +81,7 @@ public class Turret extends SubsystemBase {
 
 
   //==================== MOTOR ROTATIONS ====================
-  //Maybe put in periodic?
-  //Also  CanRotatedDegrees/55 = the current turret degree
-
+  
   public void updateTurretDeg() {
     currentDegree = getRotationDegree();
     currentRotationPower = getRotationMotorPower();
@@ -113,24 +112,23 @@ public class Turret extends SubsystemBase {
       }
     }
     previousDegree = currentDegree;
+
+    turretDegree = Math.round(currentDegree/55);
   }
+
+  //UPDATE
 
   public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
     updateTurretDeg();
-    double rotationDegree = getTurretRotationInDegrees();
     //Make sure motor doesn't power when turret is outside of limits (0-270)
-    if (rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim) {
-      //hard stop 
+    if (turretDegree >= KrotationMotorRightLim && turretDegree <= KrotationMotorLeftLim) {
       rotationMotor.set(0.0);
       return;
     }
     
     rotationMotor.set(power);
   }
-
-
   
-
 
   //Make sure motor doesn't power when hood is outside of limits (TBD)
 
