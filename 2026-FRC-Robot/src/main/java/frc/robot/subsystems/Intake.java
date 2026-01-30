@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.spark.SparkFlex;
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import static frc.robot.Constants.intakeConstants.*;
