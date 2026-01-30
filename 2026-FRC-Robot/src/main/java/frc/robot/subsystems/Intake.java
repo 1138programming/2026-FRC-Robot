@@ -2,42 +2,44 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.spark.SparkFlex;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.intakeConstants.*;
 
 
 
 
 
 public class Intake extends SubsystemBase{
-      private SparkFlex intakeMotorReel;
+    private SparkFlex intakeMotorReel;
+    private TalonFX armMotor;
+
+  public Intake() {
+      intakeMotorReel = new SparkFlex(KIntakeMotorReelId, MotorType.kBrushless);
+      armMotor = new TalonFX(KArmMotorID);
+    }
+
+    //Reel
+    public void reelIntake(double power) {
+      intakeMotorReel.set(power);
+    }
+
+    public void reelArm(double power) {
+      armMotor.set(power);
+    }
+
+    public void intakReelStop() {
+      intakeMotorReel.set(0);
+    }
+
+    public void armReelStop() {
+      armMotor.set(0);
+    }
 
 
 
-public Intake(){
-    intakeMotorReel = new SparkFlex(KIntakeMotorReelId, MotorType.kBrushless);
-  }
-
-  //Reel
-  public void reelIntake(double speed){
-    intakeMotorReel.set(speed);
-  }
-
-  public void intakReelStop(){
-    intakeMotorReel.set(0);
-  }
-
-//Extend
-
-
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    @Override
+    public void periodic() {
+      // This method will be called once per scheduler run
+    }
 }
