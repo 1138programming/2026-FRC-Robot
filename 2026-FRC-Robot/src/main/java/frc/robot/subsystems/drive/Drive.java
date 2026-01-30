@@ -46,7 +46,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.TurretConstants.*;
+import frc.robot.Constants.FieldConstants.HubConstants;
+import frc.robot.Constants.FieldConstants.HubConstants.*;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Limelight;
@@ -392,12 +396,13 @@ public class Drive extends SubsystemBase {
     };
   }
 
+  //to be implemented into shooter logic most likely
   public Pose3d turretPositionPose3d() {
     Rotation3d currentRotation = new Rotation3d(getRotation());
     Pose3d currentPose = new Pose3d(poseEstimator.getEstimatedPosition().getX(),poseEstimator.getEstimatedPosition().getY(), 0.0, currentRotation);
     
-    Translation3d translationOffset = new Translation3d(14, 14, 0);
-    Rotation3d rotationOffset = new Rotation3d(0,0,0);
+    Translation3d translationOffset = new Translation3d(TurretOffsetConstants.kForwardOffsetMeters_X, TurretOffsetConstants.kSideOffsetMeters_Y, TurretOffsetConstants.kVerticalOffsetMeters_Z); //include turret offsets once known. Placeholder is top right corner of robot
+    Rotation3d rotationOffset = new Rotation3d(TurretOffsetConstants.kTurretYawOffsetRadians, TurretOffsetConstants.kTurretPitchOffsetRadians,TurretOffsetConstants.kTurretYawOffsetRadians);
     Transform3d offsetTransformation = new Transform3d(translationOffset, rotationOffset);
 
     return currentPose.plus(offsetTransformation);
@@ -406,7 +411,7 @@ public class Drive extends SubsystemBase {
   public double distanetoCenterHub() {
     Pose3d currentPose = turretPositionPose3d();
     
-    Pose3d hubCenterTop = new Pose3d(4.625594, 4.034536, 1.8288, new Rotation3d());
+    Pose3d hubCenterTop = new Pose3d(HubConstants.kPoseX, HubConstants.kPoseY, HubConstants.kPoseZ, new Rotation3d());
     double distance = currentPose.getTranslation().getDistance(hubCenterTop.getTranslation());
     return distance;
   }
