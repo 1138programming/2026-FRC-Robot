@@ -45,7 +45,7 @@ public final class Constants {
     public static final int KturretRotationCANcoderID = 1;
     public static final int KhoodPitchCANcoderID = 3;
 
-    public static final int KleftLimSwitchID = 7;
+    public static final int KleftLimSwitchID = 9;
     public static final int KrightLimSwitchID = 8;
 
     public static final double kturretRotationstoMotorRotationCount = 55;

@@ -35,10 +35,10 @@ public class Turret extends SubsystemBase {
   DigitalInput leftLimSwitch;
   DigitalInput rightLimSwitch;
 
-  double previousDegree = getRotationDegree();
   static double CANRotatedDegrees = 0.0;
   double currentDegree;
   double currentRotationPower;
+  double previousDegree;
   
   /** Creates a new Turret. */
   public Turret() {
@@ -51,11 +51,12 @@ public class Turret extends SubsystemBase {
 
     
     //constructors
-    flywheelMotor.getConfigurator().apply(flywheelConfig);
 
     rotationMotor = new SparkMax(KrotationMotorID, MotorType.kBrushless);
     hoodMotor = new TalonFX(KhoodMotorID);
     flywheelMotor = new TalonFX(KflywheelMotorID);
+    flywheelMotor.getConfigurator().apply(flywheelConfig);
+
 
     turretRotationCANcoder = new CANcoder(KturretRotationCANcoderID);
     hoodPitchCANcoder = new CANcoder(KhoodPitchCANcoderID);
@@ -68,6 +69,9 @@ public class Turret extends SubsystemBase {
 
     leftLimSwitch = new DigitalInput(KleftLimSwitchID);
     rightLimSwitch = new DigitalInput(KrightLimSwitchID);
+
+    previousDegree = getRotationDegree();
+
   }
 
   public boolean getLeftLimitSwitchVal(){
@@ -79,9 +83,9 @@ public class Turret extends SubsystemBase {
   }
 
 
-  //==================== MOTOR ROTATIONS ====================
-  //Maybe put in periodic?
-  //Also  CanRotatedDegrees/55 = the current turret degree
+  // ==================== MOTOR ROTATIONS ====================
+  // Maybe put in periodic?
+  // Also  CanRotatedDegrees/55 = the current turret degree
 
   public void updateTurretDeg() {
     currentDegree = getRotationDegree();
