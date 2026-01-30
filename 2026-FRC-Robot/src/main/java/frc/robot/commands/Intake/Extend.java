@@ -13,7 +13,7 @@ public class Extend extends Command {
 
   private Intake intake;
 
-  public IntakeReel(Intake intake) {
+  public Extend(Intake intake) {
     this.intake = intake;
     addRequirements(intake);
   }
