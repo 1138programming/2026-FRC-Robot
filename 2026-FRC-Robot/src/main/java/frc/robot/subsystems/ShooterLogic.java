@@ -9,6 +9,10 @@ import static frc.robot.Constants.TurretConstants.kHoodAngleMinRadians;
 
 import java.util.Vector;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.drive.Drive;
@@ -16,6 +20,8 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.Constants;
 import static frc.robot.Constants.TurretConstants.*;
 import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.Constants.FieldConstants.HubConstants.*;
+import static frc.robot.Constants.TurretConstants;
 
 public class ShooterLogic extends SubsystemBase {
   /** Creates a new ShooterLogic. */
@@ -34,14 +40,15 @@ public class ShooterLogic extends SubsystemBase {
   }
 
   /**
+   * Calculates the flywheel speed, hood angle, and turret angle based on robot position in accordance to the hub center.
    * 
-   * @param robotHeading
+   * @param robotHeading 
    * @return double[] {flywheelSpeed (meters per second), hoodAngle (radians), turretAngle (radians)}
    */
   public double[] calculateShotChanges(double robotHeading) {
 
     final double g = 9.81;
-    double x = limelight.getHubCenterTagtoOffsetHubCenterDistancetoCamera() - kPassThroughPointRadius; //could be alternatively used using Pose
+    double x =  distanetoCenterHub() - kPassThroughPointRadius; //could be alternatively used using Pose
     double y = kScoreHeight; //could be alternatively used using Pose
     double a = kScoreAngle;
 
@@ -77,4 +84,28 @@ public class ShooterLogic extends SubsystemBase {
 
     return new double[] {flywheelSpeed, hoodAngle, turretAngle};
   }
+
+    //to be implemented into shooter logic most likely
+  private Pose3d turretPositionPose3d() {
+
+    Rotation3d currentRotation = new Rotation3d(drive.getRotation());
+    Pose3d currentPose = new Pose3d(drive.getPose().getX(), drive.getPose().getY(), 0.0, currentRotation);
+    
+    Translation3d translationOffset = new Translation3d(TurretOffsetConstants.kForwardOffsetMeters_X, TurretOffsetConstants.kSideOffsetMeters_Y, TurretOffsetConstants.kVerticalOffsetMeters_Z); //include turret offsets once known. Placeholder is top right corner of robot
+    Rotation3d rotationOffset = new Rotation3d(TurretOffsetConstants.kTurretYawOffsetRadians, TurretOffsetConstants.kTurretPitchOffsetRadians,TurretOffsetConstants.kTurretYawOffsetRadians);
+    Transform3d offsetTransformation = new Transform3d(translationOffset, rotationOffset);
+
+    return currentPose.plus(offsetTransformation);
+  }
+
+  private double distanetoCenterHub() {
+    Pose3d currentPose = turretPositionPose3d();
+    
+    Pose3d hubCenterTop = new Pose3d(HubConstants.kPoseX, HubConstants.kPoseY, HubConstants.kPoseZ, new Rotation3d());
+    double distance = currentPose.getTranslation().getDistance(hubCenterTop.getTranslation());
+    return distance;
+  }
 }
+
+
+
