@@ -13,7 +13,7 @@ import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.Constants.TurretConstants.*;
 
 //subsystem
-import frc.robot.commands.TurretTracking;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Turret;
 
 
@@ -35,9 +35,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-
+import frc.robot.Constants.LimelightConstants;
 //drive
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.TurretTracking;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -58,13 +59,13 @@ public class RobotContainer {
   private final Drive drive;  
   public final Laser m_Laser;
   public final Turret m_Turret;
-  private final Laser laser = new Laser();
-  toggleLaser laserToggle = new toggleLaser(laser);
+  public final Limelight limelight;
 
   // Comands
-public final TurretTracking m_Turret_Tracking;
-public final toggleLaser lasertoggle;
+ public final toggleLaser lasertoggle;
+  public final TurretTracking m_Turret_Tracking;
 
+  // Comands
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -149,18 +150,21 @@ public final toggleLaser lasertoggle;
     m_Turret_Tracking = new TurretTracking(m_Turret);
     m_Laser = new Laser();
     lasertoggle = new toggleLaser(m_Laser);
+    limelight = new Limelight(LimelightConstants.kLimelightName);
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
+
         drive =
             new Drive(
                 new GyroIOPigeon2(),
                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+                new ModuleIOTalonFX(TunerConstants.BackRight),
+                limelight);
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -189,7 +193,8 @@ public final toggleLaser lasertoggle;
                 new ModuleIOSim(TunerConstants.FrontLeft),
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
+                new ModuleIOSim(TunerConstants.BackRight),
+                limelight);
         break;
 
       default:
@@ -200,7 +205,8 @@ public final toggleLaser lasertoggle;
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                new ModuleIO() {});
+                new ModuleIO() {},
+                limelight);
         break;
     }
 
