@@ -194,6 +194,8 @@ public class Drive extends SubsystemBase {
       if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        
+
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
@@ -292,6 +294,18 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
+  }
+
+  public double getHorizontalVelocityMetersPerSecond() {
+    return getChassisSpeeds().vxMetersPerSecond;
+  }
+
+  public double getVerticalVelocityMetersPerSecond() {
+    return getChassisSpeeds().vyMetersPerSecond;
+  }
+
+  public double getAngularVelocityRadiansPerSecond() {
+    return getChassisSpeeds().omegaRadiansPerSecond;
   }
 
   /** Returns the position of each module in radians. */

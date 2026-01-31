@@ -55,7 +55,7 @@ public class ShooterLogic extends SubsystemBase {
   }
 
   /**
-   * Calculates the flywheel speed, hood angle, and turret angle based on robot position in accordance to the hub center.
+   * Calculates the flywheel speed, hood angle, and turret angle based on robot position in accordance to the hub center with velocity compensation.
    * 
    * @return double[] {flywheelSpeed (meters per second), hoodAngle (radians), turretAngle (radians)}
    */
@@ -73,9 +73,9 @@ public class ShooterLogic extends SubsystemBase {
     double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - y)));
 
     //robot velocity components -> TODO, check video to see if this matches up
-    double robotVelocity = drive.getFFCharacterizationVelocity(); //TODO: probably get the velocity from the IMU, also check units  
-    double robotVelocityXComponent = robotVelocity * Math.cos(robotAngle);
-    double robotVelocityYComponent = robotVelocity * Math.sin(robotAngle);
+    //double robotVelocity = drive.getchas(); //TODO: probably get the velocity from the IMU, also check units  
+    double robotVelocityXComponent = drive.getHorizontalVelocityMetersPerSecond();
+    double robotVelocityYComponent = drive.getVerticalVelocityMetersPerSecond();
 
     //velocity compensation variables
     double vz = flywheelSpeed * Math.sin(hoodAngle); //velocity of the projectile in z direction (vertical)
