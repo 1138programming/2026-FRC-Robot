@@ -138,15 +138,32 @@ public final class Constants {
     public static final int KturretRotationCANcoderID = 5;
     public static final int KhoodPitchCANcoderID = 6;
 
+    public static class TurretOffsetConstants {
+      //translation offsets
+      public static final double kForwardOffsetMeters_X = 0.3556; //inches = 14
+      public static final double kSideOffsetMeters_Y = 0.3556; //inches = 14
+      public static final double kVerticalOffsetMeters_Z = 0.0; //TODO: measure vertical offset
+
+      //rotation offsets
+      public static final double kTurretRollOffsetRadians = 0.0; //TODO
+      public static final double kTurretPitchOffsetRadians = 0.0; //TODO
+      public static final double kTurretYawOffsetRadians = 0.0; //TODO
+
+    }
+  
+
     public static final int KleftLimSwitchID = 9;
     public static final int KrightLimSwitchID = 8;
 
     public static final double kturretToCancoderRatio= 11; // concoder rotates 11 times per 1 rotation of turret.
   }
   public static class LimelightConstants {
+
+    public static final String kLimelightName = "limelight-down";
     public static class TagConstants {
       public static class IDConstants {
-
+        public static final int kHubCenterTagBlue = 26;
+        public static final int kHubCenterTagRed = 10;
       }
 
       public static class OffsetConstants {
@@ -165,5 +182,12 @@ public final class Constants {
   public static class LaserConstants {
     public static final int klaserDIOPort = 3;
   }
-  
+
+  public static class FieldConstants {
+    public static class HubConstants {
+      public static final double kPoseX = 4.625594;
+      public static final double kPoseY = 4.034536;
+      public static final double kPoseZ = 1.8288;
+    }
+  }
 }
