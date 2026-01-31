@@ -13,7 +13,6 @@ import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.Constants.TurretConstants.*;
 
 //subsystem
-import frc.robot.commands.TurretTracking;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Turret;
 
@@ -57,7 +56,6 @@ public class RobotContainer {
   public final Limelight limelight;
 
   // Comands
-public final TurretTracking m_Turret_Tracking;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -139,7 +137,6 @@ public final TurretTracking m_Turret_Tracking;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     m_Turret = new Turret();
-    m_Turret_Tracking = new TurretTracking(m_Turret);
     limelight = new Limelight(LimelightConstants.kLimelightName);
     switch (Constants.currentMode) {
       case REAL:
