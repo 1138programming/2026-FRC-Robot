@@ -30,19 +30,20 @@ public class Turret extends SubsystemBase {
 
   /** Creates a new Turret. */
   public Turret() {
+    
+    // constructors
+    rotationMotor = new TalonFX(KrotationMotorID);
+    hoodMotor = new TalonFX(KhoodMotorID);
+    flywheelMotor = new TalonFX(KflywheelMotorID);
+
     // Flywheel PID
     var flywheelConfig = new Slot0Configs();
     flywheelConfig.kP = KflywheelMotorP;
     flywheelConfig.kI = KflywheelMotorI;
     flywheelConfig.kD = KflywheelMotorD;
     flywheelMotorRequest = new VelocityVoltage(0).withSlot(0);
-
-    // constructors
+   
     flywheelMotor.getConfigurator().apply(flywheelConfig);
-
-    rotationMotor = new TalonFX(KrotationMotorID);
-    hoodMotor = new TalonFX(KhoodMotorID);
-    flywheelMotor = new TalonFX(KflywheelMotorID);
 
     turretRotationCANcoder = new CANcoder(KturretRotationCANcoderID);
     hoodPitchCANcoder = new CANcoder(KhoodPitchCANcoderID);

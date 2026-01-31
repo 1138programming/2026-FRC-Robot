@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.LimelightHelpers;
 
 import static frc.robot.Constants.LimelightConstants.TagConstants.OffsetConstants.*;
+import static frc.robot.Constants.LimelightConstants.TagConstants.IDConstants.*;
 
 //import static frc.robot.Constants.LimelightConstants.*;
 //conostants for later
@@ -221,6 +222,10 @@ public class Limelight extends SubsystemBase {
     return LimelightHelpers.getTY(limelightName);
   }
 
+  public double getOffsetDistance() {
+    return botpose[9];
+  }
+
   //specific offset getters for FRC 2026 april tags - these are specific values to the game 
 
   /**
@@ -247,6 +252,45 @@ public class Limelight extends SubsystemBase {
     double result = getOffsetTy();
     resetFiducial3DOffset();
     return result;
+  }
+
+  /**
+   * Calculates the distance from the limelight to the middle point of the hub's entrance and returns it.
+   * Used to calculate any other distance values as a hypotoneuse
+   * 
+   * @return Distance to middle point hub entrance (meters), -1.0 if Hub center tag not found
+   * 
+   */
+  public double getHubCenterTagtoOffsetHubCenterDistancetoCamera() {
+    setFiducial3DOffset(kX_HubCenterTagtoHubCenterMeters, 0, kY_HubCenterTagtoHubScoreHeightMeters);
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    for (LimelightHelpers.RawFiducial fiducial : fiducials) {
+      int id = fiducial.id;                    // Tag ID
+      double distToCamera = fiducial.distToCamera;  // Distance to camera
+
+      //NOTE: check if we require any other IDs
+      // if (id == kHubCenterTagRed || id == kHubCenterTagBlue) {
+      //   resetFiducial3DOffset();
+      //   return distToCamera;
+      // }
+    }
+    return -1.0; //default value, no specified ID found. 
+  }
+
+  public double getHubCenterTagtoOffsetHubCenterDistancetoRobot() {
+    setFiducial3DOffset(kX_HubCenterTagtoHubCenterMeters, 0, kY_HubCenterTagtoHubScoreHeightMeters);
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    for (LimelightHelpers.RawFiducial fiducial : fiducials) {
+      int id = fiducial.id;                    // Tag ID
+      double distToRobot = fiducial.distToRobot;  // Distance to camera
+
+      //NOTE: check if we require any other IDs
+      // if (id == kHubCenterTagRed || id == kHubCenterTagBlue) {
+      //   resetFiducial3DOffset();
+      //   return distToRobot;
+      // }
+    }
+    return -1.0; //default value, no specified ID found. 
   }
 
   public int getIsTargetsDetected() {

@@ -1,3 +1,4 @@
+
 // Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
@@ -23,6 +24,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Autos;
 import frc.robot.commands.toggleLaser;
 import frc.robot.subsystems.Laser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,12 +56,15 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;  
+  public final Laser m_Laser;
   public final Turret m_Turret;
   private final Laser laser = new Laser();
   toggleLaser laserToggle = new toggleLaser(laser);
 
   // Comands
 public final TurretTracking m_Turret_Tracking;
+public final toggleLaser lasertoggle;
+
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -141,6 +147,8 @@ public final TurretTracking m_Turret_Tracking;
   public RobotContainer() {
     m_Turret = new Turret();
     m_Turret_Tracking = new TurretTracking(m_Turret);
+    m_Laser = new Laser();
+    lasertoggle = new toggleLaser(m_Laser);
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -304,26 +312,25 @@ public final TurretTracking m_Turret_Tracking;
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> getLogiLeftYAxis() * 0.75,
+            () -> getLogiLeftXAxis() * 0.75,
+            () -> getLogiRightXAxis() * 0.75));
 
     // Lock to 0° when A button is held
-    controller
-        .a()
+    logitechBtnA
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
+                () -> getLogiLeftYAxis(),
+                () -> getLogiLeftXAxis(),
                 () -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+    logitechBtnB.onTrue(lasertoggle);
 
     // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
+    logitechBtnY
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -332,6 +339,8 @@ public final TurretTracking m_Turret_Tracking;
                     drive)
                 .ignoringDisable(true));
   }
+
+
 
   
   public double getLogiRightYAxis() {

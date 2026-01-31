@@ -129,8 +129,8 @@ public final class Constants {
     public static final int KhoodMotorID = 2;
     public static final int KflywheelMotorID = 4;
 
-    public static final int KturretRotationCANcoderID = 1;
-    public static final int KhoodPitchCANcoderID = 3;
+    public static final int KturretRotationCANcoderID = 5;
+    public static final int KhoodPitchCANcoderID = 6;
   
 
   }
@@ -146,8 +146,9 @@ public final class Constants {
       }
     }
   }
-    
+
   public static class LaserConstants {
-    public static final int kLaserDIOPort = 3;
+    public static final int klaserDIOPort = 3;
   }
+  
 }

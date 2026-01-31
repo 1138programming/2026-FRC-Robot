@@ -13,7 +13,7 @@ public class Laser extends SubsystemBase {
   DigitalOutput laser;
   /** Creates a new Laser. */
   public Laser() {
-    laser = new DigitalOutput(kLaserDIOPort);
+    laser = new DigitalOutput(klaserDIOPort);
   }
 
   public void turnOn(){
