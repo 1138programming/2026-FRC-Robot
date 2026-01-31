@@ -100,6 +100,19 @@ public class ShooterLogic extends SubsystemBase {
     return new double[] {flywheelSpeed, hoodAngle, turretAngle};
   }
 
+  /**
+   * 
+   * Used for early autoaiming to start orienting the turret until shotchanges can be calculated
+   * can also be used for updating turret angle if limelight is the only source of aiming.
+   * Will require future implementation
+   * @return suggested absolute angle to aim turret (radians)
+   */
+  public double absoluteAngletoAprilTageLimelight() {
+    double angleDif = limelight.getTx();
+    double absoluteAngle = drive.getRotation().getRadians() + Math.toRadians(angleDif);
+    return absoluteAngle;
+  }
+
   //in shooter logic as it requires continual adjustment by drive for the robot's position
   //Review if this is alright here
   private Pose3d turretPositionPose3d() {
