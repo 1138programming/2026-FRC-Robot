@@ -138,8 +138,8 @@ public final class Constants {
     public static final double KhoodMotorLeftLim = 0.0;
 
     public static final int KrotationMotorID = 2;
-    public static final int KhoodMotorID = 2;
-    public static final int KflywheelMotorID = 4;
+    public static final int KhoodMotorID = 10;
+    public static final int KflywheelMotorID = 9;
 
 
     public static final int KturretRotationCANcoderID = 5;
