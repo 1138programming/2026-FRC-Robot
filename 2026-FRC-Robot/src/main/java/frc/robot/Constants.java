@@ -7,6 +7,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.generated.TunerConstants.kSpeedAt12Volts;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -179,9 +183,12 @@ public final class Constants {
     }
 
     public static class HubConstants {
+
       public static final double kPoseX = 4.625594;
       public static final double kPoseY = 4.034536;
       public static final double kPoseZ = 1.8288;
+      public static final Pose2d kHubFieldPose2d = new Pose2d(HubConstants.kPoseX, HubConstants.kPoseY, new Rotation2d());
+      public static final Pose3d KhubFieldPose3d = new Pose3d(HubConstants.kPoseX, HubConstants.kPoseY, HubConstants.kPoseZ, new Rotation3d());
       public static final double kPassThroughPointRadius = 0.6096; //meters
     }
   }

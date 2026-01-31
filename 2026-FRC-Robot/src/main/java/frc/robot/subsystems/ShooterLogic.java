@@ -9,15 +9,21 @@ import static frc.robot.Constants.TurretConstants.kHoodAngleMinRadians;
 
 import java.util.Vector;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.drive.Drive;
 
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
+
 import static frc.robot.Constants.TurretConstants.*;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.FieldConstants.HubConstants.*;
@@ -28,29 +34,39 @@ public class ShooterLogic extends SubsystemBase {
 
   private Limelight limelight;
   private Drive drive;
+  private Turret turret;
 
-  public ShooterLogic(Limelight limelight, Drive drive) {
+  private Pose3d turretPose3d;
+  private Pose2d turretPose2d;
+
+  public ShooterLogic(Limelight limelight, Drive drive, Turret turret) {
     this.limelight = limelight;
     this.drive = drive;
+    this.turret = turret;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    //update turret pose
+    turretPose3d = turretPositionPose3d();
+    turretPose2d = turretPose3d.toPose2d();
   }
 
   /**
    * Calculates the flywheel speed, hood angle, and turret angle based on robot position in accordance to the hub center.
    * 
-   * @param robotHeading 
    * @return double[] {flywheelSpeed (meters per second), hoodAngle (radians), turretAngle (radians)}
    */
-  public double[] calculateShotChanges(double robotHeading) {
+  public double[] calculateShotChanges() {
 
     final double g = 9.81;
-    double x =  distanetoCenterHub() - kPassThroughPointRadius; //could be alternatively used using Pose
+    double x =  distancetoPose2d(HubConstants.kHubFieldPose2d) - kPassThroughPointRadius; //could be alternatively used using Pose
     double y = kScoreHeight; //could be alternatively used using Pose
     double a = kScoreAngle;
+    double robotAngle = drive.getRotation().getRadians(); //robot angle in reference to field
+    double robottoGoalAngle = turretAngletoPose2d(HubConstants.kHubFieldPose2d); //angle from robot to goal in reference to field
 
     //initial launch components
     double hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(2 * y / x - Math.tan(a))))); //this clamps the hood angle to constraints
@@ -58,7 +74,6 @@ public class ShooterLogic extends SubsystemBase {
 
     //robot velocity components -> TODO, check video to see if this matches up
     double robotVelocity = drive.getFFCharacterizationVelocity(); //TODO: probably get the velocity from the IMU, also check units  
-    double robotAngle = drive.getPose().getRotation().getRadians();
     double robotVelocityXComponent = robotVelocity * Math.cos(robotAngle);
     double robotVelocityYComponent = robotVelocity * Math.sin(robotAngle);
 
@@ -75,7 +90,7 @@ public class ShooterLogic extends SubsystemBase {
 
     //updating turret
     double turretVelCompensation = Math.atan(robotVelocityYComponent / ivr);
-    double turretAngle = (robotHeading - robotAngle + turretVelCompensation);
+    double turretAngle = (robotAngle - robottoGoalAngle) + turretVelCompensation;//TODO check signs especially for turret compensation
 
   
     if (turretAngle > Math.toRadians(180)) {
@@ -85,7 +100,8 @@ public class ShooterLogic extends SubsystemBase {
     return new double[] {flywheelSpeed, hoodAngle, turretAngle};
   }
 
-    //to be implemented into shooter logic most likely
+  //in shooter logic as it requires continual adjustment by drive for the robot's position
+  //Review if this is alright here
   private Pose3d turretPositionPose3d() {
 
     Rotation3d currentRotation = new Rotation3d(drive.getRotation());
@@ -98,13 +114,18 @@ public class ShooterLogic extends SubsystemBase {
     return currentPose.plus(offsetTransformation);
   }
 
-  private double distanetoCenterHub() {
-    Pose3d currentPose = turretPositionPose3d();
-    
-    Pose3d hubCenterTop = new Pose3d(HubConstants.kPoseX, HubConstants.kPoseY, HubConstants.kPoseZ, new Rotation3d());
-    double distance = currentPose.getTranslation().getDistance(hubCenterTop.getTranslation());
-    return distance;
+  private double distancetoPose2d(Pose2d pose2d) {
+    return turretPose2d.getTranslation().getDistance(pose2d.getTranslation());
   }
+
+  private double distancetoPose3d(Pose3d pose3d) {
+    return turretPose3d.getTranslation().getDistance(pose3d.getTranslation());
+  }
+
+  private double turretAngletoPose2d(Pose2d pose2d) {
+    return pose2d.getTranslation().minus(turretPose2d.getTranslation()).getAngle().getRadians();
+  }
+
 }
 
 

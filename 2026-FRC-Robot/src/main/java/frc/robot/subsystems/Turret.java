@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -95,7 +96,15 @@ public class Turret extends SubsystemBase {
 
   public double getRotationDegree() {
     return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset)
-        * 360.0; // converts it to a degree
+        * 360.0 / (2 * Math.PI); // converts it to a degree
+  }
+
+  public double getRotationRadians() {
+    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset);
+  }
+
+  public Rotation2d getRotationRotation2d() {
+    return new Rotation2d(getRotationRadians());
   }
 
   public double getHoodDegree() {
