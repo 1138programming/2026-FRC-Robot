@@ -150,4 +150,7 @@ public final class Constants {
   public static class LaserConstants {
     public static final int klaserDIOPort = 3;
   }
+  public static class LaserConstants {
+    public static final int kLaserDIOPort = 3;
+  }
 }
