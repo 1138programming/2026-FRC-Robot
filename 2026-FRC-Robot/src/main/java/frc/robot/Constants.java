@@ -129,10 +129,14 @@ public final class Constants {
     public static final int KhoodMotorID = 2;
     public static final int KflywheelMotorID = 4;
 
-    public static final int KturretRotationCANcoderID = 5;
-    public static final int KhoodPitchCANcoderID = 6;
-  
 
+    public static final int KturretRotationCANcoderID = 1;
+    public static final int KhoodPitchCANcoderID = 3;
+
+    public static final int KleftLimSwitchID = 9;
+    public static final int KrightLimSwitchID = 8;
+
+    public static final double kturretRotationstoMotorRotationCount = 55;
   }
   public static class LimelightConstants {
     public static class TagConstants {
@@ -145,6 +149,12 @@ public final class Constants {
         public static final double kY_HubCenterTagtoHubScoreHeightMeters = 0.70485;
       }
     }
+  }
+  public static class turretSpeedConstants {
+    public static final double KHoodMotorPower = 1.0;
+    public static final double KRotationMotorPower = 1.0;
+    public static final double KFlyWheelPower = 1.0;
+
   }
 
   public static class LaserConstants {

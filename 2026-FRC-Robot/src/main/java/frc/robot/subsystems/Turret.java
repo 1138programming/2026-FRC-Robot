@@ -10,13 +10,22 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret extends SubsystemBase {
-  // defining
-  TalonFX rotationMotor;
+
+  //defining
+  SparkMax rotationMotor;
+
   TalonFX hoodMotor;
   TalonFX flywheelMotor;
 
@@ -27,12 +36,19 @@ public class Turret extends SubsystemBase {
   PIDController hoodMotorPID;
   PIDController flywheelMotorPID;
   final VelocityVoltage flywheelMotorRequest;
+  DigitalInput leftLimSwitch;
+  DigitalInput rightLimSwitch;
 
+  static double CANRotatedDegrees = 0.0;
+  double currentDegree;
+  double currentRotationPower;
+  double previousDegree;
+  double turretDegree;
+  
   /** Creates a new Turret. */
   public Turret() {
     
     // constructors
-    rotationMotor = new TalonFX(KrotationMotorID);
     hoodMotor = new TalonFX(KhoodMotorID);
     flywheelMotor = new TalonFX(KflywheelMotorID);
 
@@ -42,8 +58,16 @@ public class Turret extends SubsystemBase {
     flywheelConfig.kI = KflywheelMotorI;
     flywheelConfig.kD = KflywheelMotorD;
     flywheelMotorRequest = new VelocityVoltage(0).withSlot(0);
-   
+
+
+    
+    //constructors
+
+    rotationMotor = new SparkMax(KrotationMotorID, MotorType.kBrushless);
+    hoodMotor = new TalonFX(KhoodMotorID);
+    flywheelMotor = new TalonFX(KflywheelMotorID);
     flywheelMotor.getConfigurator().apply(flywheelConfig);
+
 
     turretRotationCANcoder = new CANcoder(KturretRotationCANcoderID);
     hoodPitchCANcoder = new CANcoder(KhoodPitchCANcoderID);
@@ -53,21 +77,77 @@ public class Turret extends SubsystemBase {
 
     rotationMotorPID.enableContinuousInput(-1.0, 1.0);
     hoodMotorPID.enableContinuousInput(-1.0, 1.0);
+
+    leftLimSwitch = new DigitalInput(KleftLimSwitchID);
+    rightLimSwitch = new DigitalInput(KrightLimSwitchID);
+
+    previousDegree = getRotationDegree();
+
+  }
+
+  public boolean getLeftLimitSwitchVal(){
+    return leftLimSwitch.get();
+  }
+
+  public boolean getRightLimitSwitchVal(){
+    return rightLimSwitch.get();
   }
 
   // ==================== MOTOR ROTATIONS ====================
 
-  public void rotateRotationMotor(double power) { // rotates the main rotation motor of the turret
-    double rotationDegree = getRotationDegree();
-    // Make sure motor doesn't power when turret is outside of limits (0-270)
-    if (rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim) {
-      // hard stop if it's outside the 270 degrees
+
+  // ==================== MOTOR ROTATIONS ====================
+  // Maybe put in periodic?
+  // Also  CanRotatedDegrees/55 = the current turret degree
+
+  public void updateTurretDeg() {
+    currentDegree = getRotationDegree();
+    currentRotationPower = getRotationMotorPower();
+
+    if (getLeftLimitSwitchVal()) {
+      CANRotatedDegrees = KrotationMotorLeftLim * kturretRotationstoMotorRotationCount;
+      return;
+    }
+
+    if (getRightLimitSwitchVal()){
+      CANRotatedDegrees = KrotationMotorRightLim * kturretRotationstoMotorRotationCount;
+      return;
+    }
+
+    if (currentRotationPower == 0) return;
+
+    if (currentRotationPower > 0) { //assume going clockwise if true
+      if (currentDegree < previousDegree) { //did wrap around if true
+        CANRotatedDegrees += (360 - previousDegree) + currentDegree; //add wrapped around difference
+      } else {
+        CANRotatedDegrees += currentDegree - previousDegree; //didn't wrap around so just add difference
+      }
+    } else {
+      if (currentDegree > previousDegree){
+        CANRotatedDegrees += previousDegree + (360 - currentDegree);
+      } else {
+        CANRotatedDegrees += currentDegree - previousDegree;
+      }
+    }
+    previousDegree = currentDegree;
+
+    turretDegree = Math.round(currentDegree/55);
+  }
+
+  //UPDATE
+
+  public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
+    updateTurretDeg();
+    //Make sure motor doesn't power when turret is outside of limits (0-270)
+    if (turretDegree >= KrotationMotorRightLim && turretDegree <= KrotationMotorLeftLim) {
+
       rotationMotor.set(0.0);
       return;
     }
 
     rotationMotor.set(power);
   }
+  
 
   // Make sure motor doesn't power when hood is outside of limits (TBD)
 
@@ -82,7 +162,13 @@ public class Turret extends SubsystemBase {
     hoodMotor.set(power);
   }
 
-  // ==================== FLYWHEEL ====================
+
+  public double getTurretRotationInDegrees(){
+    return CANRotatedDegrees / kturretRotationstoMotorRotationCount;
+  }
+
+  //==================== FLYWHEEL ====================
+
 
   public void setFlyWheelVelocity(double velocity) {
     flywheelMotor.setControl(flywheelMotorRequest.withVelocity(velocity).withFeedForward(0.5));
@@ -94,16 +180,23 @@ public class Turret extends SubsystemBase {
 
   // ==================== MOTOR DEGREES ====================
 
-  public double getRotationDegree() {
-    return (turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset)
-        * 360.0; // converts it to a degree
+
+  public double getRotationDegree() { 
+    return ((turretRotationCANcoder.getAbsolutePosition().getValueAsDouble() - KrotationMotorOffset) * 180.0) + 180; //converts it to a degree
   }
 
   public double getHoodDegree() {
     return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - KhoodMotorOffset) * 360;
   }
 
+
   // ==================== MOVE TO FUNCTIONS ====================
+
+  public double getRotationMotorPower(){
+    return rotationMotor.get();
+  }
+
+
 
   public void rotationMoveToPosition(double degrees) {
     double rotationDegree = getRotationDegree();
@@ -121,6 +214,9 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("rotation", getRotationDegree());
+    SmartDashboard.putNumber("rotation of motor", getRotationDegree());
+    SmartDashboard.putNumber("rotation of turret",getTurretRotationInDegrees());
+    SmartDashboard.putBoolean("Left lim switch", getLeftLimitSwitchVal());
+    SmartDashboard.putBoolean("Right lim switch", getRightLimitSwitchVal());
   }
 }
