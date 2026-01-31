@@ -3,8 +3,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -13,6 +15,10 @@ import frc.robot.LimelightHelpers;
 
 import static frc.robot.Constants.LimelightConstants.TagConstants.OffsetConstants.*;
 import static frc.robot.Constants.FieldConstants.TagIDConstants.*;
+
+import java.util.function.Supplier;
+
+import static frc.robot.Constants.LimelightConstants.TagConstants.*;
 
 //import static frc.robot.Constants.LimelightConstants.*;
 //conostants for later
@@ -56,13 +62,15 @@ public class Limelight extends SubsystemBase {
 
     private final DoubleArrayPublisher orientationPublisher;
     private final DoubleArrayPublisher filterPublisher;
+    //private final Supplier<Rotation2d> rotationalSupplier;
   
 
    
 
   public Limelight(String limelightName) {
     
-    this.limelightName = limelightName; //should be instatialized with a constant value passed 
+    this.limelightName = limelightName; //should be instatialized with a constant value passed
+    //this.rotationalSupplier = rotationalSupplier; 
     LimelightOneTable = NetworkTableInstance.getDefault().getTable("limelight");
 
     botpose = LimelightOneTable.getEntry("botpose_wpiblue").getDoubleArray(new double[11]);
@@ -79,7 +87,7 @@ public class Limelight extends SubsystemBase {
       tagSpan = botpose[8];
       averageDistance = botpose[9];
       Area = botpose[10];
-      ID = botpose[11];
+      //ID = botpose[11];
 
     }
 
@@ -125,9 +133,13 @@ public class Limelight extends SubsystemBase {
       tagSpan = botpose[8];
       averageDistance = botpose[9];
       Area = botpose[10];
-      ID = botpose[11];
+      //ID = botpose[11];
 
     }
+
+    //smart dashboarrd
+    SmartDashboard.putNumber("distance to center hub top", getHubCenterTagtoOffsetHubCenterDistancetoCamera());
+
     
   }
 
@@ -222,6 +234,10 @@ public class Limelight extends SubsystemBase {
     return LimelightHelpers.getTY(limelightName);
   }
 
+  public double getOffsetDistance() {
+    return botpose[9];
+  }
+
   //specific offset getters for FRC 2026 april tags - these are specific values to the game 
 
   /**
@@ -255,11 +271,13 @@ public class Limelight extends SubsystemBase {
    * Used to calculate any other distance values as a hypotoneuse
    * 
    * @return Distance to middle point hub entrance (meters), -1.0 if Hub center tag not found
+   * @deprecated Use pose 3d to calculte distances
+   * 
    * 
    */
   public double getHubCenterTagtoOffsetHubCenterDistancetoCamera() {
     setFiducial3DOffset(kX_HubCenterTagtoHubCenterMeters, 0, kY_HubCenterTagtoHubScoreHeightMeters);
-    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
     for (LimelightHelpers.RawFiducial fiducial : fiducials) {
       int id = fiducial.id;                    // Tag ID
       double distToCamera = fiducial.distToCamera;  // Distance to camera
@@ -273,10 +291,12 @@ public class Limelight extends SubsystemBase {
     resetFiducial3DOffset();
     return -1.0; //default value, no specified ID found. 
   }
-
+  /** 
+  * @deprecated Use pose 3d to calculte distances
+  */
   public double getHubCenterTagtoOffsetHubCenterDistancetoRobot() {
     setFiducial3DOffset(kX_HubCenterTagtoHubCenterMeters, 0, kY_HubCenterTagtoHubScoreHeightMeters);
-    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials("");
+    LimelightHelpers.RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
     for (LimelightHelpers.RawFiducial fiducial : fiducials) {
       int id = fiducial.id;                    // Tag ID
       double distToRobot = fiducial.distToRobot;  // Distance to camera
@@ -295,6 +315,7 @@ public class Limelight extends SubsystemBase {
     return isTargetsDetected;
   }
   
+
   //Limelight Pose 3D compilation 
   /**
    * Compiles the Limelight botpose_wpiblue array into a Pose3d object
@@ -306,11 +327,45 @@ public class Limelight extends SubsystemBase {
     return new Pose3d(getBotPoseX(), getBotPoseY(), getBotPoseZ(), rot3d);
   }
 
-
-//botpose
-public double[] getBotPose() {
+  //botpose
+  public double[] getBotPose() {
     return botpose;
   }
+
+  public void updateOreintation(double degrees) {
+    LimelightHelpers.SetRobotOrientation(limelightName, degrees, 0,0,0,0,0);
+  }
+
+  /**
+   * Get robot positional data using MegaTag2. 
+   * 
+   * @apiNote must be called in a periodic function so robot oreintation is continously
+   * @return
+   */
+  private LimelightHelpers.PoseEstimate getPoseEstimateMT2() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+  }
+
+  public boolean existsVisionData() {
+    LimelightHelpers.PoseEstimate mt2 = getPoseEstimateMT2();
+    SmartDashboard.putBoolean("VisionDataExists", (mt2 != null && mt2.tagCount != 0));
+    if (mt2 != null) {
+      SmartDashboard.putNumber("vision tag count", mt2.tagCount);
+    }
+    return (mt2 != null && mt2.tagCount != 0);
+  }
+
+  public Pose2d getMT2Pose() {
+    return getPoseEstimateMT2().pose;
+  }
+
+  public double getMT2Time() {
+    return getPoseEstimateMT2().timestampSeconds;
+  }
+
+
+
+  
 }
 
 

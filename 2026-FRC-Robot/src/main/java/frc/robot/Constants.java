@@ -133,6 +133,7 @@ public final class Constants {
     public static final int KhoodMotorID = 2;
     public static final int KflywheelMotorID = 4;
 
+
     public static final int KturretRotationCANcoderID = 1;
     public static final int KhoodPitchCANcoderID = 3;
 
@@ -153,13 +154,16 @@ public final class Constants {
     }
   
 
+    public static final int KleftLimSwitchID = 9;
+    public static final int KrightLimSwitchID = 8;
+
+    public static final double kturretRotationstoMotorRotationCount = 55;
   }
   public static class LimelightConstants {
+
+    public static final String kLimelightName = "limelight-down";
     public static class TagConstants {
-      public static class IDConstants {
-          public static final int kHubCenterTagBlue = 26;
-          public static final int kHubCenterTagRed = 10;
-      }
+      
 
       public static class OffsetConstants {
         public static final double kX_HubCenterTagtoHubCenterMeters = -0.5969;
@@ -167,10 +171,18 @@ public final class Constants {
       }
     }
   }
-    
-  public static class LaserConstants {
-    public static final int kLaserDIOPort = 3;
+  public static class turretSpeedConstants {
+    public static final double KHoodMotorPower = 1.0;
+    public static final double KRotationMotorPower = 1.0;
+    public static final double KFlyWheelPower = 1.0;
+
   }
+
+  public static class LaserConstants {
+    public static final int klaserDIOPort = 3;
+  }
+
+  
 
   public static class FieldConstants {
     public static final double kHubHeight = 1.8288; //meters
