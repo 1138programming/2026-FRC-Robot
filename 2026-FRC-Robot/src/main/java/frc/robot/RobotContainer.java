@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.toggleLaser;
+import frc.robot.commands.TurretCommands.TurretRotate;
+import frc.robot.commands.TurretCommands.TurretSetRotation;
 import frc.robot.subsystems.Laser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -61,9 +63,15 @@ public class RobotContainer {
   public final Turret m_Turret;
   public final Limelight limelight;
 
+
   // Comands
- public final toggleLaser lasertoggle;
   public final TurretTracking m_Turret_Tracking;
+  public final TurretRotate m_Turret_Rotate_Forward;
+  public final TurretSetRotation turretresetRot; 
+  public final TurretRotate m_Turret_Rotate_Backward;
+  public final toggleLaser lasertoggle;
+
+
 
   // Comands
 
@@ -148,6 +156,10 @@ public class RobotContainer {
   public RobotContainer() {
     m_Turret = new Turret();
     m_Turret_Tracking = new TurretTracking(m_Turret);
+    m_Turret_Rotate_Forward = new TurretRotate(m_Turret, 0.15);
+    m_Turret_Rotate_Backward = new TurretRotate(m_Turret, -0.15);
+    turretresetRot = new TurretSetRotation(m_Turret, 0);
+
     m_Laser = new Laser();
     lasertoggle = new toggleLaser(m_Laser);
     limelight = new Limelight(LimelightConstants.kLimelightName);
@@ -323,17 +335,22 @@ public class RobotContainer {
             () -> getLogiRightXAxis() * 0.75));
 
     // Lock to 0° when A button is held
-    logitechBtnA
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> getLogiLeftYAxis(),
-                () -> getLogiLeftXAxis(),
-                () -> Rotation2d.kZero));
+    // logitechBtnA
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> getLogiLeftYAxis(),
+    //             () -> getLogiLeftXAxis(),
+    //             () -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
-    logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
-    logitechBtnB.onTrue(lasertoggle);
+    // logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+    logitechBtnB.whileTrue(m_Turret_Rotate_Forward);
+
+    logitechBtnA.whileTrue(m_Turret_Rotate_Backward);
+
+    logitechBtnRB.onTrue(turretresetRot);
+
 
     // Reset gyro to 0° when B button is pressed
     logitechBtnY

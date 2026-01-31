@@ -126,16 +126,21 @@ public final class Constants {
 
     public static final double KrotationMotorRightLim = 130.0;
     public static final double KrotationMotorLeftLim = 230.0;
+
+    public static final double KrotationMotorLeftMagnetRot = -141; //rot pos of CANcoder at left magent switch 
+    public static final double KrotationMotorRightMagnetRot = 140; //rot pos of CANcoder at right magent switch 
+
+
     public static final double KhoodMotorRightLim = 90.0;
     public static final double KhoodMotorLeftLim = 0.0;
 
-    public static final int KrotationMotorID = 0;
+    public static final int KrotationMotorID = 2;
     public static final int KhoodMotorID = 2;
     public static final int KflywheelMotorID = 4;
 
 
-    public static final int KturretRotationCANcoderID = 1;
-    public static final int KhoodPitchCANcoderID = 3;
+    public static final int KturretRotationCANcoderID = 5;
+    public static final int KhoodPitchCANcoderID = 6;
 
     public static final double kHoodAngleMinRadians = Math.toRadians(20.0);
     public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
@@ -157,7 +162,7 @@ public final class Constants {
     public static final int KleftLimSwitchID = 9;
     public static final int KrightLimSwitchID = 8;
 
-    public static final double kturretRotationstoMotorRotationCount = 55;
+    public static final double kturretToCancoderRatio= 11; // concoder rotates 11 times per 1 rotation of turret.
   }
   public static class LimelightConstants {
 
