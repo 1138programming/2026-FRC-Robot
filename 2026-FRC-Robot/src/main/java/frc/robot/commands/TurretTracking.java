@@ -11,9 +11,12 @@ import frc.robot.subsystems.Turret;
 public class TurretTracking extends Command {
 
   Turret turret;
+  boolean atpos;
+
   /** Creates a new TurrentTracking. */
   public TurretTracking(Turret turret) {
     this.turret = turret;
+    atpos = false;
     addRequirements(turret);
   }
 
@@ -24,16 +27,19 @@ public class TurretTracking extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    turret.rotateRotationMotor(0.1);
+    atpos = turret.rotationMoveToPosition(0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    turret.rotateRotationMotor(0);
+
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return atpos;
   }
 }

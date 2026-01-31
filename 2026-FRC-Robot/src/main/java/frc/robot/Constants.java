@@ -109,9 +109,10 @@ public final class Constants {
   }
 
   public static class TurretConstants {
-    public static final double KrotationMotorkP = 20.0;
+    public static final double KrotationMotorkP = 5;
     public static final double KrotationMotorkI = 0.0;
     public static final double KrotationMotorkD = 0.0;
+    public static final double Kturretsetpointoffset = 0.5;
 
     public static final double KhoodMotorkP = 20.0;
     public static final double KhoodMotorkI = 0.0;
@@ -122,13 +123,15 @@ public final class Constants {
     public static final double KflywheelMotorD = 0.1;
 
     public static final double KrotationMotorOffset = 0.0;
+    public static final double KrotationMotorVelocity = 0.1;
+
     public static final double KhoodMotorOffset = 0.0;
 
-    public static final double KrotationMotorRightLim = 130.0;
-    public static final double KrotationMotorLeftLim = 230.0;
+    public static final double KrotationMotorRightLim = 148;
+    public static final double KrotationMotorLeftLim = -148;
 
-    public static final double KrotationMotorLeftMagnetRot = -141; //rot pos of CANcoder at left magent switch 
-    public static final double KrotationMotorRightMagnetRot = 140; //rot pos of CANcoder at right magent switch 
+    public static final double KrotationMotorLeftMagnetRot = -138; //deg pos of CANcoder at left magent switch 
+    public static final double KrotationMotorRightMagnetRot = 138; //deg pos of CANcoder at right magent switch 
 
 
     public static final double KhoodMotorRightLim = 90.0;

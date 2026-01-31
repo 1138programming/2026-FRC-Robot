@@ -42,6 +42,10 @@ public class Turret extends SubsystemBase {
   private DigitalInput leftLimSwitch;
   private DigitalInput rightLimSwitch;
 
+  private boolean updaterotleft;
+  private boolean updaterotright;
+
+
   private double turretOffset;
   
   /** Creates a new Turret. */
@@ -88,6 +92,8 @@ public class Turret extends SubsystemBase {
     leftLimSwitch = new DigitalInput(KleftLimSwitchID);
     rightLimSwitch = new DigitalInput(KrightLimSwitchID);
 
+    updaterotleft =false;
+    updaterotright = false;
 
   }
 
@@ -112,11 +118,14 @@ public class Turret extends SubsystemBase {
 
   public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
     //Make sure motor doesn't power when turret is outside of limits (0-270)
-    if (getTurretRotationDegree() >= KrotationMotorRightLim || getTurretRotationDegree() <= KrotationMotorLeftLim)  {
-
+    if (getTurretRotationDegree() >= KrotationMotorRightLim  && power >0)  {
       rotationMotor.set(0.0);
       return;
     }
+    else if ( getTurretRotationDegree() <= KrotationMotorLeftLim && power <0) {
+      rotationMotor.set(0.0);
+      return;
+     }
 
     rotationMotor.set(power);
   }
@@ -136,7 +145,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void resetRotationDegree(double deg) {
-    turretRotationCANcoder.setPosition((deg/360) * kturretToCancoderRatio);
+    turretRotationCANcoder.setPosition(((deg/360) * kturretToCancoderRatio)- KrotationMotorOffset);
   }
 
   //==================== FLYWHEEL ====================
@@ -173,11 +182,10 @@ public class Turret extends SubsystemBase {
 
 
 
-  public void rotationMoveToPosition(double degrees) {
-    double rotationDegree = getTurretRotationDegree();
-    if (!(rotationDegree >= KrotationMotorRightLim && rotationDegree <= KrotationMotorLeftLim)) {
-      rotateRotationMotor(rotationMotorPID.calculate(getTurretRotationDegree(), degrees));
-    }
+  public boolean rotationMoveToPosition(double degrees) {
+    // rotateRotationMotor(-rotationMotorPID.calculate(getTurretRotationDegree(), degrees) * KrotationMotorVelocity);
+    SmartDashboard.putNumber("pid output", -rotationMotorPID.calculate(getTurretRotationDegree(), degrees) * KrotationMotorVelocity);
+    return (Math.abs(getTurretRotationDegree() - degrees) < Kturretsetpointoffset);
   }
 
   public void hoodMoveToPosition(double degrees) {
@@ -194,12 +202,26 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putBoolean("Left lim switch", getLeftLimitSwitchVal());
     SmartDashboard.putBoolean("Right lim switch", getRightLimitSwitchVal());
 
-    if (getLeftLimitSwitchVal()) {
-      resetRotationDegree(KrotationMotorLeftMagnetRot);   
-    }
-    else if (getRightLimitSwitchVal()) {
-      resetRotationDegree(KrotationMotorRightMagnetRot);   
+    SmartDashboard.putBoolean("reset left", updaterotleft);
+    SmartDashboard.putBoolean("reset right", updaterotright);
+
+    if (getLeftLimitSwitchVal() && !updaterotleft) {
+      resetRotationDegree(KrotationMotorLeftMagnetRot); 
+      updaterotleft = true; 
+      updaterotright = false;
+      System.out.println("reset left");
+    
 
     }
+    else if (getRightLimitSwitchVal() && !updaterotright) {
+      resetRotationDegree(KrotationMotorRightMagnetRot);   
+      updaterotright = true; 
+      updaterotleft = false; 
+      System.out.println("reset right");
+    }
+
+    // if (!getLeftLimitSwitchVal() || !getRightLimitSwitchVal()) {
+    //   updaterot =false;
+    // }
   }
 }

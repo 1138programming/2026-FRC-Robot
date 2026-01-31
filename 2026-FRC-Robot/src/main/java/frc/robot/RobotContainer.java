@@ -346,10 +346,9 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     // logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
     logitechBtnB.whileTrue(m_Turret_Rotate_Forward);
-
     logitechBtnA.whileTrue(m_Turret_Rotate_Backward);
-
     logitechBtnRB.onTrue(turretresetRot);
+    logitechBtnRB.whileTrue(m_Turret_Tracking);
 
 
     // Reset gyro to 0° when B button is pressed
