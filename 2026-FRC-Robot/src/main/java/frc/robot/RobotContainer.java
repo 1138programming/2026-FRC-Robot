@@ -26,9 +26,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.toggleLaser;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Laser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -58,10 +56,13 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;  
+  public final Laser m_Laser;
   public final Turret m_Turret;
 
   // Comands
 public final TurretTracking m_Turret_Tracking;
+public final toggleLaser lasertoggle;
+
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -144,6 +145,8 @@ public final TurretTracking m_Turret_Tracking;
   public RobotContainer() {
     m_Turret = new Turret();
     m_Turret_Tracking = new TurretTracking(m_Turret);
+    m_Laser = new Laser();
+    lasertoggle = new toggleLaser(m_Laser);
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -322,6 +325,7 @@ public final TurretTracking m_Turret_Tracking;
 
     // Switch to X pattern when X button is pressed
     logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+    logitechBtnB.onTrue(lasertoggle);
 
     // Reset gyro to 0° when B button is pressed
     logitechBtnY
@@ -333,6 +337,8 @@ public final TurretTracking m_Turret_Tracking;
                     drive)
                 .ignoringDisable(true));
   }
+
+
 
   
   public double getLogiRightYAxis() {

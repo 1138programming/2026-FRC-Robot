@@ -269,10 +269,10 @@ public class Limelight extends SubsystemBase {
       double distToCamera = fiducial.distToCamera;  // Distance to camera
 
       //NOTE: check if we require any other IDs
-      if (id == kHubCenterTagRed || id == kHubCenterTagBlue) {
-        resetFiducial3DOffset();
-        return distToCamera;
-      }
+      // if (id == kHubCenterTagRed || id == kHubCenterTagBlue) {
+      //   resetFiducial3DOffset();
+      //   return distToCamera;
+      // }
     }
     return -1.0; //default value, no specified ID found. 
   }
@@ -285,10 +285,10 @@ public class Limelight extends SubsystemBase {
       double distToRobot = fiducial.distToRobot;  // Distance to camera
 
       //NOTE: check if we require any other IDs
-      if (id == kHubCenterTagRed || id == kHubCenterTagBlue) {
-        resetFiducial3DOffset();
-        return distToRobot;
-      }
+      // if (id == kHubCenterTagRed || id == kHubCenterTagBlue) {
+      //   resetFiducial3DOffset();
+      //   return distToRobot;
+      // }
     }
     return -1.0; //default value, no specified ID found. 
   }
