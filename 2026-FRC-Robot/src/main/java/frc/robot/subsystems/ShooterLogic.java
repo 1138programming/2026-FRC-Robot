@@ -23,6 +23,8 @@ import frc.robot.subsystems.drive.Drive;
 
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.FieldConstants.HubConstants;
+import frc.robot.Constants.TurretConstants.TurretOffsetConstants;
 
 import static frc.robot.Constants.TurretConstants.*;
 import static frc.robot.Constants.FieldConstants.*;
@@ -109,9 +111,18 @@ public class ShooterLogic extends SubsystemBase {
    */
   public double absoluteAngletoAprilTageLimelight() {
     double angleDif = limelight.getTx();
-    double absoluteAngle = drive.getRotation().getRadians() + Math.toRadians(angleDif);
+    double absoluteAngle = turret.getTurretRotationDegree() + angleDif;
     return absoluteAngle;
   }
+
+  /**
+   * @return angle difference to aim turret (radians); the Tx value from limelight
+   */
+  public double getAngletoAprilTageLimelight() {
+    double angleDif = limelight.getTx();
+    return Math.toRadians(angleDif);
+  }
+
 
   //in shooter logic as it requires continual adjustment by drive for the robot's position
   //Review if this is alright here

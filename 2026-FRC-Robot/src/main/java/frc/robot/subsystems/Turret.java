@@ -180,6 +180,25 @@ public class Turret extends SubsystemBase {
     return rotationMotor.get();
   }
 
+  // ==================== STOP FUNCTIONS ========================
+
+  public void stopTurretRotation() {
+    rotationMotor.set(0.0);
+  }
+
+  public void stopFlywheel() {
+    flywheelMotor.set(0.0);
+  }
+
+  public void stopHood() {
+    hoodMotor.set(0.0);
+  }
+
+  public void stopAll() {
+    stopTurretRotation();
+    stopFlywheel();
+    stopHood();
+  }
 
 
   public boolean rotationMoveToPosition(double degrees) {
