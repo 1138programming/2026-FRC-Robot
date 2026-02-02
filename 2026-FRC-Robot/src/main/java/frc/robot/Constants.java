@@ -148,6 +148,8 @@ public final class Constants {
     public static final double kHoodAngleMinRadians = Math.toRadians(20.0);
     public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
 
+    public static final double kFlyWheelRadiusMeters = 0.0762; // 3 inches in meters PLACEHOLDER PLACEHOLDER
+
     public static class TurretOffsetConstants {
       //translation offsets
       public static final double kForwardOffsetMeters_X = 0.3556; //inches = 14

@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.ShooterLogic;
 
+import static frc.robot.Constants.TurretConstants.*;
+
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoAim extends Command {
   /** Creates a new AutoAim. */
@@ -32,9 +34,11 @@ public class AutoAim extends Command {
   public void execute() {
 
     double[] logicData = shooterLogic.calculateShotChanges();
-    turret.setFlyWheelVelocity(Math.toDegrees(logicData[1]));
-    turret.hoodMoveToPosition(Math.toDegrees(logicData[2]));
-    turret.rotationMoveToPosition(Math.toDegrees(logicData[0]));
+    double velocity = logicData[0] / (2 * Math.PI * kFlyWheelRadiusMeters); //convert m/s to RPM or motor units as needed -> measure wheel radius and test
+
+    turret.setFlyWheelVelocity(velocity);
+    turret.hoodMoveToPosition(Math.toDegrees(logicData[1]));
+    turret.rotationMoveToPosition(Math.toDegrees(logicData[2]));
 
   }
 
