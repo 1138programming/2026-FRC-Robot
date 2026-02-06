@@ -14,6 +14,7 @@ import static frc.robot.Constants.TurretConstants.*;
 
 //subsystem
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.ShooterLogic;
 import frc.robot.subsystems.Turret;
 
 
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.toggleLaser;
+import frc.robot.commands.TurretCommands.TurretAutoAim;
 import frc.robot.commands.TurretCommands.TurretRotate;
 import frc.robot.commands.TurretCommands.TurretSetRotation;
 import frc.robot.subsystems.Laser;
@@ -63,14 +65,16 @@ public class RobotContainer {
   public final Turret m_Turret;
   public final Limelight limelight;
 
+  public final ShooterLogic logic;
+
 
   // Comands
   public final TurretTracking m_Turret_Tracking;
   public final TurretRotate m_Turret_Rotate_Forward;
   public final TurretSetRotation turretresetRot; 
   public final TurretRotate m_Turret_Rotate_Backward;
+  public final TurretAutoAim m_Turret_Auto_Aim;
   public final toggleLaser lasertoggle;
-
 
 
   // Comands
@@ -222,6 +226,10 @@ public class RobotContainer {
         break;
     }
 
+    logic = new ShooterLogic(limelight, drive, m_Turret);
+    m_Turret_Auto_Aim = new TurretAutoAim(m_Turret, logic); //note would it be wise to have autoaim get the turret and limelight objects from logic itself?
+
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -330,9 +338,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> getLogiLeftYAxis() * 0.75,
-            () -> getLogiLeftXAxis() * 0.75,
-            () -> getLogiRightXAxis() * 0.75));
+            () -> getLogiLeftYAxis() ,
+            () -> getLogiLeftXAxis() ,
+            () -> getLogiRightXAxis()));
 
     // Lock to 0° when A button is held
     // logitechBtnA
@@ -345,10 +353,16 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     // logitechBtnX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    //turret controls
     logitechBtnB.whileTrue(m_Turret_Rotate_Forward);
     logitechBtnA.whileTrue(m_Turret_Rotate_Backward);
     logitechBtnRB.onTrue(turretresetRot);
     logitechBtnRB.whileTrue(m_Turret_Tracking);
+
+    //laser controls
+    logitechBtnLB.onTrue(lasertoggle);
+    logitechBtnRT.whileTrue(m_Turret_Auto_Aim);
 
 
     // Reset gyro to 0° when B button is pressed

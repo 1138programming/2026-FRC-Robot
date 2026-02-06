@@ -5,15 +5,18 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.LaserConstants.*;
 
 public class Laser extends SubsystemBase {
   DigitalOutput laser;
+  boolean laserVal;
   /** Creates a new Laser. */
   public Laser() {
     laser = new DigitalOutput(klaserDIOPort);
+    laserVal = laser.get();
   }
 
   public void turnOn(){
@@ -24,13 +27,16 @@ public class Laser extends SubsystemBase {
     laser.set(false);
   }
 
+
   public void toggleLaser(){
-    boolean laserVal = laser.get();
+    laserVal = laser.get();
     laser.set(!laserVal);
   }
 
   @Override
   public void periodic() {
+    laserVal = laser.get();
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("Laser Status", laserVal);
   }
 }

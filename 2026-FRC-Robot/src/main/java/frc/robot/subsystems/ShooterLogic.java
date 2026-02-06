@@ -107,11 +107,23 @@ public class ShooterLogic extends SubsystemBase {
    * Will require future implementation
    * @return suggested absolute angle to aim turret (radians)
    */
-  public double absoluteAngletoAprilTageLimelight() {
+  public double absoluteAngletoAprilTagLimelightRadians() {
     double angleDif = limelight.getTx();
     double absoluteAngle = drive.getRotation().getRadians() + Math.toRadians(angleDif);
     return absoluteAngle;
   }
+
+  public double absoluteAngletoAprilTagLimelightDegrees() {
+    return Math.toDegrees(absoluteAngletoAprilTagLimelightRadians());
+  }
+
+  public double absoluteAngletoAprilTagLimelightDegrees(double limelightOffsetAngleDegrees) {
+    double angleDif = limelight.getTxHelper();
+    double absoluteAngle = limelightOffsetAngleDegrees + angleDif;
+    return absoluteAngle;
+  }
+
+
 
   //in shooter logic as it requires continual adjustment by drive for the robot's position
   //Review if this is alright here

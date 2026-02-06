@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -109,29 +110,33 @@ public final class Constants {
   }
 
   public static class TurretConstants {
-    public static final double KrotationMotorkP = 5;
-    public static final double KrotationMotorkI = 0.0;
-    public static final double KrotationMotorkD = 0.0;
-    public static final double Kturretsetpointoffset = 0.5;
+    public static final double KrotationMotorkP = 0.011;// 0.011
+    public static final double KrotationMotorkI = 0.000; //0.000
+    public static final double KrotationMotorkD = 0.000; //0.000
+    public static final double Kturretsetpointoffset = 0.1;
+
+    public static final double KrotationMotorCoefficient = 1;
+    public static final double KrotationMotorMaxVelocity = 0.8;
+
 
     public static final double KhoodMotorkP = 20.0;
     public static final double KhoodMotorkI = 0.0;
     public static final double KhoodMotorkD = 0.0;
+  
 
     public static final double KflywheelMotorP = 2.4;
     public static final double KflywheelMotorI = 0.0;
     public static final double KflywheelMotorD = 0.1;
 
-    public static final double KrotationMotorOffset = 0.0;
-    public static final double KrotationMotorVelocity = 0.1;
-
     public static final double KhoodMotorOffset = 0.0;
+    public static final double KrotationMotorOffset = 0.0;
+
 
     public static final double KrotationMotorRightLim = 148;
     public static final double KrotationMotorLeftLim = -148;
 
-    public static final double KrotationMotorLeftMagnetRot = -138; //deg pos of CANcoder at left magent switch 
-    public static final double KrotationMotorRightMagnetRot = 138; //deg pos of CANcoder at right magent switch 
+    public static final double KrotationMotorLeftMagnetRot = -137; //deg pos of CANcoder at left magent switch 138 +1
+    public static final double KrotationMotorRightMagnetRot = 137; //deg pos of CANcoder at right magent switch 138-1
 
 
     public static final double KhoodMotorRightLim = 90.0;
@@ -147,6 +152,8 @@ public final class Constants {
 
     public static final double kHoodAngleMinRadians = Math.toRadians(20.0);
     public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
+
+    public static final boolean useSoftStops = true; 
 
     public static class TurretOffsetConstants {
       //translation offsets
@@ -169,7 +176,7 @@ public final class Constants {
   }
   public static class LimelightConstants {
 
-    public static final String kLimelightName = "limelight-down";
+    public static final String kLimelightName = "limelight-up";
     public static class TagConstants {
       
 

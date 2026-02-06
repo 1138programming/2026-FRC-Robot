@@ -97,7 +97,7 @@ public class Limelight extends SubsystemBase {
     filterPublisher =    LimelightOneTable.getDoubleArrayTopic("fiducial_id_filters_set").publish();
 
 
-  //stores the data for the LL
+  //stores the data for the LL 
   }
 
   public void periodic() {
@@ -138,7 +138,6 @@ public class Limelight extends SubsystemBase {
     }
 
     //smart dashboarrd
-    SmartDashboard.putNumber("distance to center hub top", getHubCenterTagtoOffsetHubCenterDistancetoCamera());
 
     
   }
@@ -212,6 +211,11 @@ public class Limelight extends SubsystemBase {
 
   public double getTx() {
     return tx;
+  }
+
+  //temporary 
+  public double getTxHelper() {
+    return LimelightHelpers.getTX(limelightName);
   }
 
   public double getTy() {

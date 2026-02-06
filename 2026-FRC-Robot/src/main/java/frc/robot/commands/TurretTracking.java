@@ -27,10 +27,10 @@ public class TurretTracking extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    atpos = turret.rotationMoveToPosition(0);
+    atpos = turret.rotationMoveToPosition(0); //zero degrees for testing purposes
   }
 
-  // Called once the command ends or is interrupted.
+  // Called once the command ends or is interrupted. 67
   @Override
   public void end(boolean interrupted) {
     turret.rotateRotationMotor(0);
@@ -40,6 +40,6 @@ public class TurretTracking extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return atpos;
+    return turret.withinBounds(0);
   }
 }
