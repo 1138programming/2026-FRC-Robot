@@ -154,6 +154,7 @@ public final class Constants {
     public static final double kHoodAngleMaxRadians = Math.toRadians(80.0);
 
     public static final boolean useSoftStops = true; 
+    public static final double kFlyWheelRadiusMeters = 0.0762; // 3 inches in meters PLACEHOLDER PLACEHOLDER
 
     public static class TurretOffsetConstants {
       //translation offsets
