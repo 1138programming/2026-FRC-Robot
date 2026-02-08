@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.drive.Drive;
@@ -54,6 +55,17 @@ public class ShooterLogic extends SubsystemBase {
     //update turret pose
     turretPose3d = turretPositionPose3d();
     turretPose2d = turretPose3d.toPose2d();
+    // addTurretRotationtoPose();
+
+    //SmartDashboard.putNumber("TX Helper", absoluteAngletoAprilTagLimelightDegrees(0));
+    SmartDashboard.putString("Turret Pose 3d", turretPose3d.toString());
+    SmartDashboard.putString("Turret Pose 2d", turretPose2d.toString());
+    SmartDashboard.putString("diff translation", Constants.FieldConstants.HubConstants.kHubFieldPose2d.getTranslation().minus(turretPose2d.getTranslation()).toString());
+
+    SmartDashboard.putNumber("Distance to Hub Center", distancetoPose2d(Constants.FieldConstants.HubConstants.kHubFieldPose2d));
+    SmartDashboard.putNumber("Angle to Hub Center", turretAngletoPose2d(Constants.FieldConstants.HubConstants.kHubFieldPose2d));
+    SmartDashboard.putNumber("turret angle output", relativeTurretAngletoPos(Constants.FieldConstants.HubConstants.kHubFieldPose2d));
+
   }
 
   /**
@@ -61,6 +73,7 @@ public class ShooterLogic extends SubsystemBase {
    * 
    * @return double[] {flywheelSpeed (meters per second), hoodAngle (radians), turretAngle (radians)}
    */
+
   public double[] calculateShotChanges() {
 
     final double g = 9.81;
@@ -124,6 +137,17 @@ public class ShooterLogic extends SubsystemBase {
     double absoluteAngle = limelightOffsetAngleDegrees + angleDif;
     return absoluteAngle;
   }
+  public double relativeTurretAngletoPos( Pose2d pose) {
+    double angle = turretAngletoPose2d(pose);
+    if(angle > 180) {
+      angle -= 360;
+    } 
+    if(angle < -180) {
+      angle += 360;
+    } 
+    return angle;
+    
+  }
 
 
 
@@ -143,11 +167,18 @@ public class ShooterLogic extends SubsystemBase {
     Pose3d currentPose = new Pose3d(drive.getPose().getX(), drive.getPose().getY(), 0.0, currentRotation);
     
     Translation3d translationOffset = new Translation3d(TurretOffsetConstants.kForwardOffsetMeters_X, TurretOffsetConstants.kSideOffsetMeters_Y, TurretOffsetConstants.kVerticalOffsetMeters_Z); //include turret offsets once known. Placeholder is top right corner of robot
-    Rotation3d rotationOffset = new Rotation3d(TurretOffsetConstants.kTurretYawOffsetRadians, TurretOffsetConstants.kTurretPitchOffsetRadians,TurretOffsetConstants.kTurretYawOffsetRadians);
+    Rotation3d rotationOffset = new Rotation3d(TurretOffsetConstants.kTurretYawOffsetRadians, TurretOffsetConstants.kTurretPitchOffsetRadians,TurretOffsetConstants.kTurretYawOffsetRadians - Math.toRadians(turret.getTurretRotationDegree()));
     Transform3d offsetTransformation = new Transform3d(translationOffset, rotationOffset);
 
     return currentPose.plus(offsetTransformation);
   }
+
+  // private void addTurretRotationtoPose() {
+  //   Rotation3d currentRotation = turretPose3d.getRotation();
+  //   Rotation3d newRotation = new Rotation3d(currentRotation.getMeasureX().magnitude(), currentRotation.getMeasureY().magnitude(), currentRotation.getMeasureZ().magnitude() - Math.toRadians(turret.getTurretRotationDegree())); //negative turret angle because pose is CCW + and turret angle is CW +
+  //   turretPose3d.rotateBy(newRotation);
+    
+  // } 
 
   private double distancetoPose2d(Pose2d pose2d) {
     return turretPose2d.getTranslation().getDistance(pose2d.getTranslation());
@@ -158,7 +189,14 @@ public class ShooterLogic extends SubsystemBase {
   }
 
   private double turretAngletoPose2d(Pose2d pose2d) {
-    return pose2d.getTranslation().minus(turretPose2d.getTranslation()).getAngle().getRadians();
+    Translation2d difftranslation = pose2d.getTranslation().minus(turretPose2d.getTranslation());
+    // if(difftranslation.getAngle().getDegrees() > 180) {
+    //   return drive.getRotation().getDegrees() - ( difftranslation.getAngle().getDegrees() - 360); //90 because turret 0 is 90 degrees according to field
+    // } 
+  
+    return drive.getRotation().getDegrees() - difftranslation.getAngle().getDegrees(); //90 because turret 0 is 90 degrees according to field
+
+    //return Math.toDegrees(Math.atan(difftranslation.getY() / difftranslation.getX()));   // pose2d.getTranslation().minus(turretPose2d.getTranslation()).getAngle().getRadians();
   }
 
 }

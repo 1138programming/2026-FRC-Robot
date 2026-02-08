@@ -110,10 +110,10 @@ public final class Constants {
   }
 
   public static class TurretConstants {
-    public static final double KrotationMotorkP = 0.011;// 0.011
+    public static final double KrotationMotorkP = 0.025;// 0.011
     public static final double KrotationMotorkI = 0.000; //0.000
-    public static final double KrotationMotorkD = 0.000; //0.000
-    public static final double Kturretsetpointoffset = 0.1;
+    public static final double KrotationMotorkD = 0.0001; //0.000
+    public static final double Kturretsetpointoffset = 0.5;
 
     public static final double KrotationMotorCoefficient = 1;
     public static final double KrotationMotorMaxVelocity = 0.8;
@@ -158,9 +158,9 @@ public final class Constants {
 
     public static class TurretOffsetConstants {
       //translation offsets
-      public static final double kForwardOffsetMeters_X = 0.3556; //inches = 14
-      public static final double kSideOffsetMeters_Y = 0.3556; //inches = 14
-      public static final double kVerticalOffsetMeters_Z = 0.0; //TODO: measure vertical offset
+      public static final double kForwardOffsetMeters_X = 0.0; //inches = 14
+      public static final double kSideOffsetMeters_Y = 0.0; //inches = 14
+      public static final double kVerticalOffsetMeters_Z = 0.6096; //TODO: measure vertical offset
 
       //rotation offsets
       public static final double kTurretRollOffsetRadians = 0.0; //TODO
@@ -177,7 +177,7 @@ public final class Constants {
   }
   public static class LimelightConstants {
 
-    public static final String kLimelightName = "limelight-up";
+    public static final String kLimelightName = "limelight-down";
     public static class TagConstants {
       
 
@@ -211,8 +211,9 @@ public final class Constants {
     }
 
     public static class HubConstants {
-
-      public static final double kPoseX = 4.625594;
+      
+      //TODO add blue hub as well  (the values below are for red)
+      public static final double kPoseX = 11.887454;
       public static final double kPoseY = 4.034536;
       public static final double kPoseZ = 1.8288;
       public static final Pose2d kHubFieldPose2d = new Pose2d(HubConstants.kPoseX, HubConstants.kPoseY, new Rotation2d());

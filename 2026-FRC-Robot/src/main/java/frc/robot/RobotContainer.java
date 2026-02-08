@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.toggleLaser;
+import frc.robot.commands.TurretCommands.FlyWheelSetSpeed;
 import frc.robot.commands.TurretCommands.TurretAutoAim;
 import frc.robot.commands.TurretCommands.TurretRotate;
 import frc.robot.commands.TurretCommands.TurretSetRotation;
@@ -75,6 +76,7 @@ public class RobotContainer {
   public final TurretRotate m_Turret_Rotate_Backward;
   public final TurretAutoAim m_Turret_Auto_Aim;
   public final toggleLaser lasertoggle;
+  public final FlyWheelSetSpeed m_SetSpeed;
 
 
   // Comands
@@ -163,6 +165,7 @@ public class RobotContainer {
     m_Turret_Rotate_Forward = new TurretRotate(m_Turret, 0.15);
     m_Turret_Rotate_Backward = new TurretRotate(m_Turret, -0.15);
     turretresetRot = new TurretSetRotation(m_Turret, 0);
+    m_SetSpeed = new FlyWheelSetSpeed(m_Turret, -0.65);
 
     m_Laser = new Laser();
     lasertoggle = new toggleLaser(m_Laser);
@@ -357,12 +360,14 @@ public class RobotContainer {
     //turret controls
     logitechBtnB.whileTrue(m_Turret_Rotate_Forward);
     logitechBtnA.whileTrue(m_Turret_Rotate_Backward);
-    logitechBtnRB.onTrue(turretresetRot);
+    logitechBtnX.onTrue(turretresetRot);
     logitechBtnRB.whileTrue(m_Turret_Tracking);
 
     //laser controls
     logitechBtnLB.onTrue(lasertoggle);
     logitechBtnRT.whileTrue(m_Turret_Auto_Aim);
+    //logitechBtnRT.whileTrue(m_SetSpeed);
+
 
 
     // Reset gyro to 0° when B button is pressed

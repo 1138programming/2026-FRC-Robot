@@ -34,11 +34,12 @@ public class TurretRotate extends Command {
   public void end(boolean interrupted) {
     turret.rotateRotationMotor(0);
 
+
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (speed >= 0 && turret.softStopRight()) || (speed <= 0 && turret.softStopLeft());
+    return  false;//(speed >= 0 && turret.softStopRight()) || (speed <= 0 && turret.softStopLeft());
   }
 }

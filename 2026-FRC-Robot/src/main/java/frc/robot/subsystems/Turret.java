@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -31,7 +32,9 @@ public class Turret extends SubsystemBase {
   private SparkMax rotationMotor;
 
   private TalonFX hoodMotor;
-  private TalonFX flywheelMotor;
+  // private TalonFX flywheelMotor;
+
+  private SparkFlex flywheelMotor;
 
   private CANcoder turretRotationCANcoder;
   private CANcoder hoodPitchCANcoder;
@@ -54,7 +57,7 @@ public class Turret extends SubsystemBase {
     
     // constructors
     hoodMotor = new TalonFX(KhoodMotorID);
-    flywheelMotor = new TalonFX(KflywheelMotorID);
+    flywheelMotor = new SparkFlex(19,MotorType.kBrushless);
 
     // Flywheel PID
     var flywheelConfig = new Slot0Configs();
@@ -69,8 +72,8 @@ public class Turret extends SubsystemBase {
 
     rotationMotor = new SparkMax(KrotationMotorID, MotorType.kBrushless);
     hoodMotor = new TalonFX(KhoodMotorID);
-    flywheelMotor = new TalonFX(KflywheelMotorID);
-    flywheelMotor.getConfigurator().apply(flywheelConfig);
+    // flywheelMotor = new TalonFX(KflywheelMotorID);
+    // flywheelMotor.getConfigurator().apply(flywheelConfig);
 
     turretRotationCANcoder = new CANcoder(KturretRotationCANcoderID, TunerConstants.kCANBus);
     hoodPitchCANcoder = new CANcoder(KhoodPitchCANcoderID);
@@ -144,6 +147,7 @@ public class Turret extends SubsystemBase {
     //   return;
     //  }
 
+
     rotationMotor.set(power);
   }
   
@@ -168,12 +172,20 @@ public class Turret extends SubsystemBase {
   //==================== FLYWHEEL ====================
 
 
+  // public void setFlyWheelVelocity(double velocity) {
+  //   flywheelMotor.setControl(flywheelMotorRequest.withVelocity(velocity).withFeedForward(0.5));
+  // }
+
+  // public double getFlywheelMotorVelocity() {
+  //   return flywheelMotor.getVelocity().getValueAsDouble();
+  // }
+
   public void setFlyWheelVelocity(double velocity) {
-    flywheelMotor.setControl(flywheelMotorRequest.withVelocity(velocity).withFeedForward(0.5));
+    flywheelMotor.set(velocity);
   }
 
   public double getFlywheelMotorVelocity() {
-    return flywheelMotor.getVelocity().getValueAsDouble();
+    return flywheelMotor.getEncoder().getVelocity();
   }
 
   // ==================== MOTOR DEGREES ====================
@@ -217,6 +229,10 @@ public class Turret extends SubsystemBase {
     stopHood();
   }
 
+  public void restrotationmotorpid() {
+    System.out.println("rset");
+    rotationMotorPID.reset();
+  }
 
   public boolean rotationMoveToPosition(double degrees) {
     rotateRotationMotor(Math.min(rotationMotorPID.calculate(getTurretRotationDegree(), degrees) * KrotationMotorCoefficient, KrotationMotorMaxVelocity));
@@ -236,6 +252,9 @@ public class Turret extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("rotation of turret ", getTurretRotationDegree());
     SmartDashboard.putNumber("rotation of turret raw",turretRotationCANcoder.getPosition().getValueAsDouble());
+
+    SmartDashboard.putNumber("flywheel speed", getFlywheelMotorVelocity());
+    
     SmartDashboard.putBoolean("Left lim switch", getLeftLimitSwitchVal());
     SmartDashboard.putBoolean("Right lim switch", getRightLimitSwitchVal());
 
