@@ -12,6 +12,8 @@ import static frc.robot.Constants.OperatorConstants.*;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.Constants.TurretConstants.*;
 
+import java.util.Optional;
+
 //subsystem
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.ShooterLogic;
@@ -21,6 +23,7 @@ import frc.robot.subsystems.Turret;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -32,6 +35,7 @@ import frc.robot.commands.TurretCommands.FlyWheelSetSpeed;
 import frc.robot.commands.TurretCommands.TurretAutoAim;
 import frc.robot.commands.TurretCommands.TurretRotate;
 import frc.robot.commands.TurretCommands.TurretSetRotation;
+import frc.robot.commands.TurretCommands.TurretTracking;
 import frc.robot.subsystems.Laser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,7 +47,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import frc.robot.Constants.LimelightConstants;
 //drive
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.TurretTracking;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -162,8 +165,8 @@ public class RobotContainer {
   public RobotContainer() {
     m_Turret = new Turret();
     m_Turret_Tracking = new TurretTracking(m_Turret);
-    m_Turret_Rotate_Forward = new TurretRotate(m_Turret, 0.15);
-    m_Turret_Rotate_Backward = new TurretRotate(m_Turret, -0.15);
+    m_Turret_Rotate_Forward = new TurretRotate(m_Turret, -0.15);
+    m_Turret_Rotate_Backward = new TurretRotate(m_Turret, 0.15);
     turretresetRot = new TurretSetRotation(m_Turret, 0);
     m_SetSpeed = new FlyWheelSetSpeed(m_Turret, -0.65);
 
@@ -229,9 +232,8 @@ public class RobotContainer {
         break;
     }
 
-    logic = new ShooterLogic(limelight, drive, m_Turret);
+    logic = new ShooterLogic(limelight, drive, m_Turret, DriverStation.getAlliance());
     m_Turret_Auto_Aim = new TurretAutoAim(m_Turret, logic); //note would it be wise to have autoaim get the turret and limelight objects from logic itself?
-
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

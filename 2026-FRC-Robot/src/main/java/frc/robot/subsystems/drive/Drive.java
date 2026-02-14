@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -113,6 +114,7 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+  private Field2d feild = new Field2d();
 
   public Drive(
       GyroIO gyroIO,
@@ -228,8 +230,10 @@ public class Drive extends SubsystemBase {
     limelight.updateOreintation(poseEstimator.getEstimatedPosition().getRotation().getDegrees());
     boolean isUsingVision = updateOdometryWithMT2();
     SmartDashboard.putBoolean("isUsingVision", isUsingVision);
-    SmartDashboard.putString("drive pose estimater", poseEstimator.getEstimatedPosition().toString()) ;
-
+    SmartDashboard.putString("drive pose estimater", poseEstimator.getEstimatedPosition().toString());
+    SmartDashboard.putNumber("base delta angle", getAngularVelocityRadiansPerSecond() * 180/ Math.PI);
+    feild.setRobotPose(getPose());
+    SmartDashboard.putData("feild",feild);
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
     SmartDashboard.putNumber("meters to center hub", distanetoCenterHub());
@@ -240,7 +244,7 @@ public class Drive extends SubsystemBase {
   //extra periodic methods
   public boolean updateOdometryWithMT2() {
     if (limelight.existsVisionData()) {
-      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7,0.7,99999999));
+      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7,0.7,0.7));//0.7,0.7,99999999
       poseEstimator.addVisionMeasurement(limelight.getMT2Pose(), limelight.getMT2Time());
       return true;
     }
@@ -425,7 +429,7 @@ public class Drive extends SubsystemBase {
   public double distanetoCenterHub() {
     Pose3d currentPose = turretPositionPose3d();
     
-    Pose3d hubCenterTop = new Pose3d(HubConstants.kPoseX, HubConstants.kPoseY, HubConstants.kPoseZ, new Rotation3d());
+    Pose3d hubCenterTop = new Pose3d(HubConstants.red.kPoseX, HubConstants.red.kPoseY, HubConstants.red.kPoseZ, new Rotation3d());
     double distance = currentPose.getTranslation().getDistance(hubCenterTop.getTranslation());
     return distance;
   }

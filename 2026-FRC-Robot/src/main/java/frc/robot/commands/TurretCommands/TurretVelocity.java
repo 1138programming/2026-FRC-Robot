@@ -2,46 +2,44 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.TurretCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Turret;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurretTracking extends Command {
+public class TurretVelocity extends Command {
 
   Turret turret;
-  boolean atpos;
-
+  double speed;
   /** Creates a new TurrentTracking. */
-  public TurretTracking(Turret turret) {
+  public TurretVelocity(Turret turret, double speed) {
     this.turret = turret;
-    atpos = false;
+    this.speed = speed;
     addRequirements(turret);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    turret.restrotationmotorpid();
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    atpos = turret.rotationMoveToPosition(0); //zero degrees for testing purposes
+    turret.rotateRotationMotor(speed);
   }
 
-  // Called once the command ends or is interrupted. 67
+  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     turret.rotateRotationMotor(0);
+
 
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return  false;//(speed >= 0 && turret.softStopRight()) || (speed <= 0 && turret.softStopLeft());
   }
 }

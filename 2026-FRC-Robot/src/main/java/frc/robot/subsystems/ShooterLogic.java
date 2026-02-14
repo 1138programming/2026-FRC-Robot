@@ -4,9 +4,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.TurretConstants.kHoodAngleMaxRadians;
-import static frc.robot.Constants.TurretConstants.kHoodAngleMinRadians;
-
+import java.util.Optional;
 import java.util.Vector;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,6 +15,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Limelight;
@@ -25,6 +25,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.HubConstants;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.TurretConstants.TurretOffsetConstants;
 
 import static frc.robot.Constants.TurretConstants.*;
@@ -39,13 +40,38 @@ public class ShooterLogic extends SubsystemBase {
   private Drive drive;
   private Turret turret;
 
+  private Boolean readyToShoot; 
   private Pose3d turretPose3d;
   private Pose2d turretPose2d;
 
-  public ShooterLogic(Limelight limelight, Drive drive, Turret turret) {
+  private Pose2d kHubFieldPose2d;
+
+  private double[] shotChangeDataHub;
+
+  public enum Targets {
+    HUB
+  }
+
+
+  public ShooterLogic(Limelight limelight, Drive drive, Turret turret, Optional<Alliance> alliance) {
     this.limelight = limelight;
     this.drive = drive;
     this.turret = turret;
+    readyToShoot = false;
+
+    if (alliance.isPresent()) {
+      if (alliance.get() == Alliance.Red) {
+        kHubFieldPose2d = HubConstants.red.kHubFieldPose2d;
+      }
+
+      if (alliance.get() == Alliance.Blue) {
+        kHubFieldPose2d = HubConstants.blue.kHubFieldPose2d;
+      }
+    } else {
+      //default red cause thats what the wooden hub we have has
+      kHubFieldPose2d = HubConstants.red.kHubFieldPose2d;
+    }
+
   }
 
   @Override
@@ -57,14 +83,18 @@ public class ShooterLogic extends SubsystemBase {
     turretPose2d = turretPose3d.toPose2d();
     // addTurretRotationtoPose();
 
+    //shot change math
+    shotChangeDataHub = calculateShotChanges(kHubFieldPose2d);
+
+     
+
     //SmartDashboard.putNumber("TX Helper", absoluteAngletoAprilTagLimelightDegrees(0));
     SmartDashboard.putString("Turret Pose 3d", turretPose3d.toString());
     SmartDashboard.putString("Turret Pose 2d", turretPose2d.toString());
-    SmartDashboard.putString("diff translation", Constants.FieldConstants.HubConstants.kHubFieldPose2d.getTranslation().minus(turretPose2d.getTranslation()).toString());
+    SmartDashboard.putString("diff translation", kHubFieldPose2d.getTranslation().minus(turretPose2d.getTranslation()).toString());
 
-    SmartDashboard.putNumber("Distance to Hub Center", distancetoPose2d(Constants.FieldConstants.HubConstants.kHubFieldPose2d));
-    SmartDashboard.putNumber("Angle to Hub Center", turretAngletoPose2d(Constants.FieldConstants.HubConstants.kHubFieldPose2d));
-    SmartDashboard.putNumber("turret angle output", relativeTurretAngletoPos(Constants.FieldConstants.HubConstants.kHubFieldPose2d));
+    SmartDashboard.putNumber("Distance to Hub Center", distancetoPose2d(kHubFieldPose2d));
+    SmartDashboard.putNumber("Angle to Hub Center", relativeTurretAngletoPos(kHubFieldPose2d));
 
   }
 
@@ -74,14 +104,14 @@ public class ShooterLogic extends SubsystemBase {
    * @return double[] {flywheelSpeed (meters per second), hoodAngle (radians), turretAngle (radians)}
    */
 
-  public double[] calculateShotChanges() {
+  public double[] calculateShotChanges(Pose2d target) {
 
     final double g = 9.81;
-    double x =  distancetoPose2d(HubConstants.kHubFieldPose2d) - kPassThroughPointRadius; //could be alternatively used using Pose
+    double x =  distancetoPose2d(target) - kPassThroughPointRadius; //could be alternatively used using Pose
     double y = kScoreHeight; //could be alternatively used using Pose
     double a = kScoreAngle;
     double robotAngle = drive.getRotation().getRadians(); //robot angle in reference to field
-    double robottoGoalAngle = turretAngletoPose2d(HubConstants.kHubFieldPose2d); //angle from robot to goal in reference to field
+    double robottoGoalAngle = turretAngletoPose2d(target); //angle from robot to goal in reference to field
 
     //initial launch components
     double hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(2 * y / x - Math.tan(a))))); //this clamps the hood angle to constraints
@@ -105,7 +135,7 @@ public class ShooterLogic extends SubsystemBase {
 
     //updating turret
     double turretVelCompensation = Math.atan(robotVelocityYComponent / ivr);
-    double turretAngle = (robotAngle - robottoGoalAngle) + turretVelCompensation;//TODO check signs especially for turret compensation
+    double turretAngle = turretAngletoPose2d(target) + turretVelCompensation;//TODO check signs especially for turret compensation
 
   
     if (turretAngle > Math.toRadians(180)) {
@@ -114,6 +144,12 @@ public class ShooterLogic extends SubsystemBase {
 
     return new double[] {flywheelSpeed, hoodAngle, turretAngle};
   }
+  
+
+
+  //---------------------//
+  //----- LL aiming -----//
+  //---------------------//
 
   /**
    * 
@@ -137,18 +173,44 @@ public class ShooterLogic extends SubsystemBase {
     double absoluteAngle = limelightOffsetAngleDegrees + angleDif;
     return absoluteAngle;
   }
-  public double relativeTurretAngletoPos( Pose2d pose) {
+
+  //-----------------------//
+  //----- Odom Aiming -----//
+  //-----------------------//
+
+/////////////////
+//     //     ///
+/////// /////////
+/////////////////
+//             //
+/////////////////
+
+  /**
+   * @return relative angle that the turret must be at to face towards a pose
+   */
+  public double relativeTurretAngletoPos(Pose2d pose) {
     double angle = turretAngletoPose2d(pose);
     if(angle > 180) {
       angle -= 360;
     } 
     if(angle < -180) {
       angle += 360;
-    } 
+    }
+
     return angle;
-    
   }
 
+  // angle used for when we just want parameters
+  private double TurretAnglefromabsolute(double angle) {
+    if(angle > 180) {
+      angle -= 360;
+    } 
+    if(angle < -180) {
+      angle += 360;
+    }
+
+    return angle;
+  }
 
 
   /**
@@ -159,26 +221,76 @@ public class ShooterLogic extends SubsystemBase {
     return Math.toRadians(angleDif);
   }
 
+  //---------------------//
+  //-- Turret Tracking --//
+  //---------------------//
+
+  /**
+   * Tracks the given feild position
+   * @return whether the turret is ready to shoot
+   */
+  public Boolean turretTracking(Pose2d pose) {
+    double angle = relativeTurretAngletoPos(pose);
+    double deltaangle = (drive.getAngularVelocityRadiansPerSecond() * 180)/ Math.PI; // change in deg per sec of the base4
+    // deltaangle = deltaangle 
+
+    angle -= TurretConstants.KturretBodyOffset;
+    readyToShoot = turret.rotationmotorpidatsetpoint();
+
+    if (angle > KrotationMotorRightLim + Kturretsetpointoffset) {
+      angle = KrotationMotorRightLim;
+      readyToShoot = false;
+    }
+    else if (angle < KrotationMotorLeftLim - Kturretsetpointoffset) {
+      angle = KrotationMotorRightLim;
+      readyToShoot = false;
+    }
+
+    SmartDashboard.putNumber("turret angle output", angle);
+
+    // turret.rotationMoveToPosition(relativeTurretAngletoPos(pose));
+    turret.rotationMoveToPosition(angle,deltaangle);
+    return readyToShoot;
+  }
+
+  public Boolean turretTracking(double angle) {
+    angle = TurretAnglefromabsolute(angle);
+    angle -= TurretConstants.KturretBodyOffset;
+    readyToShoot = turret.rotationmotorpidatsetpoint();
+
+        if (angle > KrotationMotorRightLim + Kturretsetpointoffset) {
+      angle = KrotationMotorRightLim;
+      readyToShoot = false;
+    }
+    else if (angle < KrotationMotorLeftLim - Kturretsetpointoffset) {
+      angle = KrotationMotorRightLim;
+      readyToShoot = false;
+    }
+
+    SmartDashboard.putNumber("turret angle output", angle);
+    // turret.rotationMoveToPosition(relativeTurretAngletoPos(pose));
+    turret.rotationMoveToPosition(angle,0);
+    return readyToShoot;
+    
+  } 
+
+
   //in shooter logic as it requires continual adjustment by drive for the robot's position
   //Review if this is alright here
+  
   private Pose3d turretPositionPose3d() {
 
-    Rotation3d currentRotation = new Rotation3d(drive.getRotation());
-    Pose3d currentPose = new Pose3d(drive.getPose().getX(), drive.getPose().getY(), 0.0, currentRotation);
+    Pose3d currentPose = new Pose3d(drive.getPose().getX(), drive.getPose().getY(), 0.0, new Rotation3d(drive.getRotation()));
     
     Translation3d translationOffset = new Translation3d(TurretOffsetConstants.kForwardOffsetMeters_X, TurretOffsetConstants.kSideOffsetMeters_Y, TurretOffsetConstants.kVerticalOffsetMeters_Z); //include turret offsets once known. Placeholder is top right corner of robot
-    Rotation3d rotationOffset = new Rotation3d(TurretOffsetConstants.kTurretYawOffsetRadians, TurretOffsetConstants.kTurretPitchOffsetRadians,TurretOffsetConstants.kTurretYawOffsetRadians - Math.toRadians(turret.getTurretRotationDegree()));
+    
+    //yaw angle should be only independent value from drive and offsets and should be updated periodically
+    //yaw of the turret is subtracted because turret is CW positive while Pose is CCW positive
+    Rotation3d rotationOffset = new Rotation3d(TurretOffsetConstants.kTurretYawOffsetRadians, TurretOffsetConstants.kTurretPitchOffsetRadians, TurretOffsetConstants.kTurretYawOffsetRadians - Math.toRadians(turret.getTurretRotationDegree())); 
     Transform3d offsetTransformation = new Transform3d(translationOffset, rotationOffset);
 
     return currentPose.plus(offsetTransformation);
   }
-
-  // private void addTurretRotationtoPose() {
-  //   Rotation3d currentRotation = turretPose3d.getRotation();
-  //   Rotation3d newRotation = new Rotation3d(currentRotation.getMeasureX().magnitude(), currentRotation.getMeasureY().magnitude(), currentRotation.getMeasureZ().magnitude() - Math.toRadians(turret.getTurretRotationDegree())); //negative turret angle because pose is CCW + and turret angle is CW +
-  //   turretPose3d.rotateBy(newRotation);
-    
-  // } 
 
   private double distancetoPose2d(Pose2d pose2d) {
     return turretPose2d.getTranslation().getDistance(pose2d.getTranslation());
@@ -188,15 +300,50 @@ public class ShooterLogic extends SubsystemBase {
     return turretPose3d.getTranslation().getDistance(pose3d.getTranslation());
   }
 
+  /**
+   *
+   * @param pose2d
+   * @return Returns the angle of the bot to the Pose2d relative to the field in degrees
+   */
+  private double botAngletoPose2d(Pose2d pose2d) {
+    return pose2d.getTranslation().minus(turretPose2d.getTranslation()).getAngle().getDegrees();
+  }
+
+  /**
+   * 
+   * @param pose2d
+   * @return The yaw angle of the turret to directly face the Pose2d position
+   */
   private double turretAngletoPose2d(Pose2d pose2d) {
     Translation2d difftranslation = pose2d.getTranslation().minus(turretPose2d.getTranslation());
-    // if(difftranslation.getAngle().getDegrees() > 180) {
-    //   return drive.getRotation().getDegrees() - ( difftranslation.getAngle().getDegrees() - 360); //90 because turret 0 is 90 degrees according to field
-    // } 
-  
-    return drive.getRotation().getDegrees() - difftranslation.getAngle().getDegrees(); //90 because turret 0 is 90 degrees according to field
+    return drive.getRotation().getDegrees() - difftranslation.getAngle().getDegrees(); 
+  }
 
-    //return Math.toDegrees(Math.atan(difftranslation.getY() / difftranslation.getX()));   // pose2d.getTranslation().minus(turretPose2d.getTranslation()).getAngle().getRadians();
+  public Double getShotChangeFlywheelVelocity(Targets target) {
+    switch (target) {
+      case HUB:
+        return shotChangeDataHub[0];
+      default:
+        return null;
+    }
+  }
+
+  public Double getShotChangeHoodAngle(Targets target) {
+        switch (target) {
+      case HUB:
+        return shotChangeDataHub[1];
+      default:
+        return null;
+    }
+  }
+
+  public Double getShotChangeTurretAngle(Targets target) {
+        switch (target) {
+      case HUB:
+        return shotChangeDataHub[2];
+      default:
+        return null;
+    }
   }
 
 }

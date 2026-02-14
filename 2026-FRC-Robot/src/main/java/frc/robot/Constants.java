@@ -113,10 +113,13 @@ public final class Constants {
     public static final double KrotationMotorkP = 0.025;// 0.011
     public static final double KrotationMotorkI = 0.000; //0.000
     public static final double KrotationMotorkD = 0.0001; //0.000
-    public static final double Kturretsetpointoffset = 0.5;
+    public static final double Kturretsetpointoffset = 0.2;// pid tolerance
+    public static final double KturretBodyOffset = 14; //8.5, offset of flywheel to direction of turret cause deisgner are dumb, degrees
 
     public static final double KrotationMotorCoefficient = 1;
     public static final double KrotationMotorMaxVelocity = 0.8;
+    public static final double KrotationMotorMinVelocity = 0.02;
+
 
 
     public static final double KhoodMotorkP = 20.0;
@@ -133,9 +136,9 @@ public final class Constants {
 
 
     public static final double KrotationMotorRightLim = 148;
-    public static final double KrotationMotorLeftLim = -148;
+    public static final double KrotationMotorLeftLim = -151;// -148
 
-    public static final double KrotationMotorLeftMagnetRot = -137; //deg pos of CANcoder at left magent switch 138 +1
+    public static final double KrotationMotorLeftMagnetRot = -140; // -137 deg pos of CANcoder at left magent switch 138 +1
     public static final double KrotationMotorRightMagnetRot = 137; //deg pos of CANcoder at right magent switch 138-1
 
 
@@ -157,15 +160,16 @@ public final class Constants {
     public static final double kFlyWheelRadiusMeters = 0.0762; // 3 inches in meters PLACEHOLDER PLACEHOLDER
 
     public static class TurretOffsetConstants {
-      //translation offsets
-      public static final double kForwardOffsetMeters_X = 0.0; //inches = 14
-      public static final double kSideOffsetMeters_Y = 0.0; //inches = 14
-      public static final double kVerticalOffsetMeters_Z = 0.6096; //TODO: measure vertical offset
+      //translation offsets -> PLEASE UPDATE
+      //currently configured for base/alpha bot 
+      public static final double kForwardOffsetMeters_X = 0.0;
+      public static final double kSideOffsetMeters_Y = 0.0;
+      public static final double kVerticalOffsetMeters_Z = 0.6096; 
 
       //rotation offsets
-      public static final double kTurretRollOffsetRadians = 0.0; //TODO
-      public static final double kTurretPitchOffsetRadians = 0.0; //TODO
-      public static final double kTurretYawOffsetRadians = 0.0; //TODO
+      public static final double kTurretRollOffsetRadians = 0.0; 
+      public static final double kTurretPitchOffsetRadians = 0.0; 
+      public static final double kTurretYawOffsetRadians = 0.0; 
 
     }
   
@@ -211,14 +215,25 @@ public final class Constants {
     }
 
     public static class HubConstants {
-      
-      //TODO add blue hub as well  (the values below are for red)
-      public static final double kPoseX = 11.887454;
-      public static final double kPoseY = 4.034536;
-      public static final double kPoseZ = 1.8288;
-      public static final Pose2d kHubFieldPose2d = new Pose2d(HubConstants.kPoseX, HubConstants.kPoseY, new Rotation2d());
-      public static final Pose3d KhubFieldPose3d = new Pose3d(HubConstants.kPoseX, HubConstants.kPoseY, HubConstants.kPoseZ, new Rotation3d());
+
+      public static class red {
+        public static final double kPoseX = 11.887454;
+        public static final double kPoseY = 4.034536;
+        public static final double kPoseZ = 1.8288;
+        public static final Pose2d kHubFieldPose2d = new Pose2d(kPoseX, kPoseY, new Rotation2d());
+        public static final Pose3d KhubFieldPose3d = new Pose3d(kPoseX, kPoseY, kPoseZ, new Rotation3d());
+      }
+
+      public static class blue {
+        public static final double kPoseX = 4.625594;
+        public static final double kPoseY = 4.034536;
+        public static final double kPoseZ = 1.8288;
+        public static final Pose2d kHubFieldPose2d = new Pose2d(kPoseX, kPoseY, new Rotation2d());
+        public static final Pose3d KhubFieldPose3d = new Pose3d(kPoseX, kPoseY, kPoseZ, new Rotation3d());
+      }
+
       public static final double kPassThroughPointRadius = 0.6096; //meters
+
     }
   }
 }

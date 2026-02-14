@@ -33,12 +33,12 @@ public class AutoAim extends Command {
   @Override
   public void execute() {
 
-    double[] logicData = shooterLogic.calculateShotChanges();
-    double velocity = logicData[0] / (2 * Math.PI * kFlyWheelRadiusMeters); //convert m/s to RPM or motor units as needed -> measure wheel radius and test
+    // double[] logicData = shooterLogic.calculateShotChanges();
+    // double velocity = logicData[0] / (2 * Math.PI * kFlyWheelRadiusMeters); //convert m/s to RPM or motor units as needed -> measure wheel radius and test
 
-    turret.setFlyWheelVelocity(velocity);
-    turret.hoodMoveToPosition(Math.toDegrees(logicData[1]));
-    turret.rotationMoveToPosition(Math.toDegrees(logicData[2]));
+    // turret.setFlyWheelVelocity(velocity);
+    // turret.hoodMoveToPosition(Math.toDegrees(logicData[1]));
+    // turret.rotationMoveToPosition(Math.toDegrees(logicData[2]));
 
   }
 

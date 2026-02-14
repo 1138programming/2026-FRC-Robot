@@ -5,22 +5,18 @@
 package frc.robot.commands.TurretCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import static frc.robot.Constants.*;
-import frc.robot.subsystems.ShooterLogic;
 import frc.robot.subsystems.Turret;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurretAutoAim extends Command {
+public class TurretTracking extends Command {
 
   Turret turret;
-  ShooterLogic logic;
-  // boolean atpos;
+  boolean atpos;
 
   /** Creates a new TurrentTracking. */
-  public TurretAutoAim(Turret turret, ShooterLogic logic) {
+  public TurretTracking(Turret turret) {
     this.turret = turret;
-    this.logic = logic;
-    // atpos = false;
+    atpos = false;
     addRequirements(turret);
   }
 
@@ -33,8 +29,7 @@ public class TurretAutoAim extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // atpos = turret.rotationMoveToPosition(logic.relativeTurretAngletoPos(FieldConstants.HubConstants.red.kHubFieldPose2d) + TurretConstants.KturretFlywheelOffset); 
-    logic.turretTracking(FieldConstants.HubConstants.red.kHubFieldPose2d);
+    atpos = turret.rotationMoveToPosition(0,0); //zero degrees for testing purposes
   }
 
   // Called once the command ends or is interrupted. 67
