@@ -111,10 +111,16 @@ public final class Constants {
 
   public static class TurretConstants {
     public static final double KrotationMotorkP = 0.025;// 0.011
-    public static final double KrotationMotorkI = 0.000; //0.000
+    public static final double KrotationMotorkI = 0.15; //0.000
     public static final double KrotationMotorkD = 0.0001; //0.000
+    public static final double KrotationMotorkIzone = 1; 
+
+
+    public static final double KrotationMotorkS = 0.025;// 0.00
+    public static final double KrotationMotorkV = 0.0009; //0.0012
+
     public static final double Kturretsetpointoffset = 0.2;// pid tolerance
-    public static final double KturretBodyOffset = 14; //8.5, offset of flywheel to direction of turret cause deisgner are dumb, degrees
+    public static final double KturretBodyOffset = 12; //8.5, offset of flywheel to direction of turret cause deisgner are dumb, degrees
 
     public static final double KrotationMotorCoefficient = 1;
     public static final double KrotationMotorMaxVelocity = 0.8;
@@ -135,11 +141,11 @@ public final class Constants {
     public static final double KrotationMotorOffset = 0.0;
 
 
-    public static final double KrotationMotorRightLim = 148;
+    public static final double KrotationMotorRightLim = 151;//148
     public static final double KrotationMotorLeftLim = -151;// -148
 
     public static final double KrotationMotorLeftMagnetRot = -140; // -137 deg pos of CANcoder at left magent switch 138 +1
-    public static final double KrotationMotorRightMagnetRot = 137; //deg pos of CANcoder at right magent switch 138-1
+    public static final double KrotationMotorRightMagnetRot = 140; //137deg pos of CANcoder at right magent switch 138-1
 
 
     public static final double KhoodMotorRightLim = 90.0;

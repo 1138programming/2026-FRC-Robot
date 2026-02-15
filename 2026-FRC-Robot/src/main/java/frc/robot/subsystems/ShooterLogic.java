@@ -216,7 +216,7 @@ public class ShooterLogic extends SubsystemBase {
   /**
    * @return angle difference to aim turret (radians); the Tx value from limelight
    */
-  public double getAngletoAprilTageLimelight() {
+  public double getAngletoAprilTagLimelight() {
     double angleDif = limelight.getTx();
     return Math.toRadians(angleDif);
   }
@@ -229,7 +229,7 @@ public class ShooterLogic extends SubsystemBase {
    * Tracks the given feild position
    * @return whether the turret is ready to shoot
    */
-  public Boolean turretTracking(Pose2d pose) {
+  public boolean turretTracking(Pose2d pose) {
     double angle = relativeTurretAngletoPos(pose);
     double deltaangle = (drive.getAngularVelocityRadiansPerSecond() * 180)/ Math.PI; // change in deg per sec of the base4
     // deltaangle = deltaangle 
@@ -249,11 +249,17 @@ public class ShooterLogic extends SubsystemBase {
     SmartDashboard.putNumber("turret angle output", angle);
 
     // turret.rotationMoveToPosition(relativeTurretAngletoPos(pose));
-    turret.rotationMoveToPosition(angle,deltaangle);
+    turret.rotationMoveToPosition(angle,0);
     return readyToShoot;
   }
 
-  public Boolean turretTracking(double angle) {
+  public void turretMatchDrive() {
+    double deltaangle = (drive.getAngularVelocityRadiansPerSecond() * 180)/ Math.PI; // change in deg per sec of the base4
+    turret.rotateRotationMotorAtVelocity(deltaangle);
+    return;
+  }
+
+  public boolean turretTracking(double angle) {
     angle = TurretAnglefromabsolute(angle);
     angle -= TurretConstants.KturretBodyOffset;
     readyToShoot = turret.rotationmotorpidatsetpoint();

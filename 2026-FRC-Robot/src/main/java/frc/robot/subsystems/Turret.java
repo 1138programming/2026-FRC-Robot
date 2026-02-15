@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.TurretConstants.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -94,15 +96,19 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("turret rot ki", KrotationMotorkI);
     SmartDashboard.putNumber("turret rot kd", KrotationMotorkD);
 
+    SmartDashboard.putNumber("turret rot ks", KrotationMotorkS);
+    SmartDashboard.putNumber("turret rot kv", KrotationMotorkV);
+
     SmartDashboard.putNumber("turret left magnet deg", KrotationMotorLeftMagnetRot);
     SmartDashboard.putNumber("turret right magnet deg", KrotationMotorRightMagnetRot);
 
 
     rotationMotorPID = new PIDController(KrotationMotorkP, KrotationMotorkI, KrotationMotorkD);
-    rotationMotorFeedforward = new SimpleMotorFeedforward(0, 0.2);
+    rotationMotorFeedforward = new SimpleMotorFeedforward(KrotationMotorkS, KrotationMotorkV);
     hoodMotorPID = new PIDController(KhoodMotorkP, KhoodMotorkI, KhoodMotorkD);
 
     rotationMotorPID.disableContinuousInput();
+    rotationMotorPID.setIZone(KrotationMotorkIzone);
     rotationMotorPID.setTolerance(Kturretsetpointoffset);
    
     hoodMotorPID.disableContinuousInput();
@@ -152,23 +158,25 @@ public class Turret extends SubsystemBase {
       rotationMotor.set(Math.max(power,-0.4));
       return;
      }
-      SmartDashboard.putNumber("power out", power);
 
     rotationMotor.set(power);
   }
 
   public void rotateRotationMotorAtVelocity(double Velocity) { //rotates the main rotation motor of the turret
     //Make sure motor doesn't power when turret is outside of limits (0-270)
-    if (getTurretRotationDegree() >= KrotationMotorRightMagnetRot  && Velocity >0)  {
-      rotationMotor.set(Math.min(Velocity,2));
-      return;
+    if (getTurretRotationDegree() >= KrotationMotorRightMagnetRot)  {
+      Velocity = Math.min(Velocity,10);
+      
     }
-    else if ( getTurretRotationDegree() <= KrotationMotorLeftMagnetRot && Velocity <0) {
-      rotationMotor.set(Math.max(Velocity,-2));
-      return;
-     }
+    else if (getTurretRotationDegree() <= KrotationMotorLeftMagnetRot) {
+      Velocity = Math.max(Velocity,-10);
+    }
+    double out = rotationMotorFeedforward.calculate(Velocity);
+    //rotationMotorFeedforward.calculateWithVelocities(getRotationVelocityDegPerSecond(),Velocity);
+    SmartDashboard.putNumber("power out", out);
+    SmartDashboard.putNumber("velocity out", Velocity);
 
-    rotationMotor.set(rotationMotorFeedforward.calculate(Velocity));
+    rotationMotor.set(out);
   }
 
 
@@ -191,7 +199,6 @@ public class Turret extends SubsystemBase {
 
   //==================== FLYWHEEL ====================
 
-
   // public void setFlyWheelVelocity(double velocity) {
   //   flywheelMotor.setControl(flywheelMotorRequest.withVelocity(velocity).withFeedForward(0.5));
   // }
@@ -213,7 +220,7 @@ public class Turret extends SubsystemBase {
     return ((turretRotationCANcoder.getPosition().getValueAsDouble() - KrotationMotorOffset) / kturretToCancoderRatio ) * 360 ; //converts it to a degree
   }
 
-    public double getRotationVelocityDeg() {
+    public double getRotationVelocityDegPerSecond() {
     return (turretRotationCANcoder.getVelocity().getValueAsDouble()/ kturretToCancoderRatio) * 360;
   }
 
@@ -254,23 +261,27 @@ public class Turret extends SubsystemBase {
 
   public boolean rotationMoveToPosition(double degrees, double feedforward) {
     double power = rotationMotorPID.calculate(getTurretRotationDegree(), degrees) * KrotationMotorCoefficient;
+    feedforward = rotationMotorFeedforward.calculate(feedforward);
     power = Math.min(power,KrotationMotorMaxVelocity);
     power = Math.max(power,-KrotationMotorMaxVelocity);
-    if (power > 0 ) {
-      power = Math.max(power,KrotationMotorMinVelocity);
-    }
-    else if (power < 0 ) {
-      power = Math.min(power,-KrotationMotorMinVelocity);
-    }
+    // if (power > 0 ) {
+    //   power = Math.max(power,KrotationMotorMinVelocity);
+    // }
+    // else if (power < 0 ) {
+    //   power = Math.min(power,-KrotationMotorMinVelocity);
+    // }
 
     if (rotationMotorPID.atSetpoint()) {
       rotateRotationMotor(0);
     }
     else{
-      rotateRotationMotor(0 );
+      rotateRotationMotor(power + feedforward);
     }
     SmartDashboard.putBoolean("pid at setpoint",rotationMotorPID.atSetpoint());
-    SmartDashboard.putNumber("feedforward",rotationMotorFeedforward.calculate(feedforward));
+    SmartDashboard.putNumber("pid error",rotationMotorPID.getError());
+    Logger.recordOutput("pid error",rotationMotorPID.getError());
+
+    // SmartDashboard.putNumber("feedforward",rotationMotorFeedforward.calculate(feedforward));
     return rotationMotorPID.atSetpoint();
   }
 
@@ -296,7 +307,8 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("rotation of turret raw",turretRotationCANcoder.getPosition().getValueAsDouble());
 
     // SmartDashboard.putNumber("flywheel speed", getFlywheelMotorVelocity());
-    SmartDashboard.putNumber("rotation speed", getRotationVelocityDeg());
+    SmartDashboard.putNumber("rotation speed", getRotationVelocityDegPerSecond());
+    Logger.recordOutput("rotation speed", getRotationVelocityDegPerSecond());
 
     
     SmartDashboard.putBoolean("Left lim switch", getLeftLimitSwitchVal());
@@ -308,8 +320,10 @@ public class Turret extends SubsystemBase {
     rotationMotorPID.setP(SmartDashboard.getNumber("turret rot kp", KrotationMotorkP));
     rotationMotorPID.setI(SmartDashboard.getNumber("turret rot ki", KrotationMotorkI));
     rotationMotorPID.setD(SmartDashboard.getNumber("turret rot kd", KrotationMotorkD));
-    
 
+    rotationMotorFeedforward.setKs(SmartDashboard.getNumber("turret rot ks", KrotationMotorkS));
+    rotationMotorFeedforward.setKv(SmartDashboard.getNumber("turret rot kv", KrotationMotorkV));
+    
     if (getLeftLimitSwitchVal() && !updaterotleft) {
       resetRotationDegree(SmartDashboard.getNumber("turret left magnet deg", KrotationMotorLeftMagnetRot)); 
       updaterotleft = true; 

@@ -33,9 +33,11 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.toggleLaser;
 import frc.robot.commands.TurretCommands.FlyWheelSetSpeed;
 import frc.robot.commands.TurretCommands.TurretAutoAim;
+import frc.robot.commands.TurretCommands.TurretMatchDrive;
 import frc.robot.commands.TurretCommands.TurretRotate;
 import frc.robot.commands.TurretCommands.TurretSetRotation;
 import frc.robot.commands.TurretCommands.TurretTracking;
+import frc.robot.commands.TurretCommands.TurretVelocity;
 import frc.robot.subsystems.Laser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -77,6 +79,8 @@ public class RobotContainer {
   public final TurretRotate m_Turret_Rotate_Forward;
   public final TurretSetRotation turretresetRot; 
   public final TurretRotate m_Turret_Rotate_Backward;
+  public final TurretVelocity m_Turret_Rotate_Velocity;
+  public final TurretMatchDrive m_turretMatchDrive;
   public final TurretAutoAim m_Turret_Auto_Aim;
   public final toggleLaser lasertoggle;
   public final FlyWheelSetSpeed m_SetSpeed;
@@ -165,8 +169,9 @@ public class RobotContainer {
   public RobotContainer() {
     m_Turret = new Turret();
     m_Turret_Tracking = new TurretTracking(m_Turret);
-    m_Turret_Rotate_Forward = new TurretRotate(m_Turret, -0.15);
-    m_Turret_Rotate_Backward = new TurretRotate(m_Turret, 0.15);
+    m_Turret_Rotate_Forward = new TurretRotate(m_Turret, -0.1);
+    m_Turret_Rotate_Backward = new TurretRotate(m_Turret, 0.1);
+    m_Turret_Rotate_Velocity = new TurretVelocity(m_Turret, 50);
     turretresetRot = new TurretSetRotation(m_Turret, 0);
     m_SetSpeed = new FlyWheelSetSpeed(m_Turret, -0.65);
 
@@ -234,6 +239,7 @@ public class RobotContainer {
 
     logic = new ShooterLogic(limelight, drive, m_Turret, DriverStation.getAlliance());
     m_Turret_Auto_Aim = new TurretAutoAim(m_Turret, logic); //note would it be wise to have autoaim get the turret and limelight objects from logic itself?
+    m_turretMatchDrive = new TurretMatchDrive(m_Turret, logic);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -343,8 +349,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> getLogiLeftYAxis() ,
-            () -> getLogiLeftXAxis() ,
+            () -> getLogiLeftYAxis(),
+            () -> getLogiLeftXAxis(),
             () -> getLogiRightXAxis()));
 
     // Lock to 0° when A button is held
@@ -362,12 +368,14 @@ public class RobotContainer {
     //turret controls
     logitechBtnB.whileTrue(m_Turret_Rotate_Forward);
     logitechBtnA.whileTrue(m_Turret_Rotate_Backward);
-    logitechBtnX.onTrue(turretresetRot);
+    logitechBtnX.whileTrue(m_Turret_Rotate_Velocity);
     logitechBtnRB.whileTrue(m_Turret_Tracking);
 
     //laser controls
     logitechBtnLB.onTrue(lasertoggle);
     logitechBtnRT.whileTrue(m_Turret_Auto_Aim);
+    logitechBtnLT.whileTrue(m_turretMatchDrive);
+
     //logitechBtnRT.whileTrue(m_SetSpeed);
 
 

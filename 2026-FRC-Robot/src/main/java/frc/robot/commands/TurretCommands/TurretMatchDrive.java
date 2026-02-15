@@ -5,41 +5,50 @@
 package frc.robot.commands.TurretCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import static frc.robot.Constants.*;
+
+import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.ShooterLogic;
 import frc.robot.subsystems.Turret;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurretVelocity extends Command {
+public class TurretMatchDrive extends Command {
 
   Turret turret;
-  double speed;
+  ShooterLogic logic;
+  // boolean atpos;
+
   /** Creates a new TurrentTracking. */
-  public TurretVelocity(Turret turret, double speed) {
+  public TurretMatchDrive(Turret turret, ShooterLogic logic) {
     this.turret = turret;
-    this.speed = speed;
+    this.logic = logic;
+    // atpos = false;
     addRequirements(turret);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    turret.restrotationmotorpid();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    turret.rotateRotationMotorAtVelocity(speed);
+    // atpos = turret.rotationMoveToPosition(logic.relativeTurretAngletoPos(FieldConstants.HubConstants.red.kHubFieldPose2d) + TurretConstants.KturretFlywheelOffset); 
+    logic.turretMatchDrive();
   }
 
-  // Called once the command ends or is interrupted.
+  // Called once the command ends or is interrupted. 67
   @Override
   public void end(boolean interrupted) {
     turret.stopTurretRotation();
-
 
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return  false;//(speed >= 0 && turret.softStopRight()) || (speed <= 0 && turret.softStopLeft());
+    return false;
   }
 }
