@@ -146,6 +146,14 @@ public class Turret extends SubsystemBase {
     return (angle > KrotationMotorRightMagnetRot || angle < KrotationMotorLeftMagnetRot);
   }
 
+  public boolean hasLeftReset() {
+    return updaterotleft;
+  }
+
+  public boolean hasRightReset() {
+    return updaterotright;
+  }
+
   // ==================== MOTOR ROTATIONS ====================
   
   public void rotateRotationMotor(double power) { //rotates the main rotation motor of the turret
@@ -171,12 +179,12 @@ public class Turret extends SubsystemBase {
     else if (getTurretRotationDegree() <= KrotationMotorLeftMagnetRot) {
       Velocity = Math.max(Velocity,-10);
     }
-    double out = rotationMotorFeedforward.calculate(Velocity);
+    double out = rotationMotorFeedforward.calculateWithVelocities(getRotationVelocityDegPerSecond(),Velocity);
     //rotationMotorFeedforward.calculateWithVelocities(getRotationVelocityDegPerSecond(),Velocity);
     SmartDashboard.putNumber("power out", out);
     SmartDashboard.putNumber("velocity out", Velocity);
 
-    rotationMotor.set(out);
+    rotateRotationMotor(out);
   }
 
 
@@ -309,6 +317,8 @@ public class Turret extends SubsystemBase {
     // SmartDashboard.putNumber("flywheel speed", getFlywheelMotorVelocity());
     SmartDashboard.putNumber("rotation speed", getRotationVelocityDegPerSecond());
     Logger.recordOutput("rotation speed", getRotationVelocityDegPerSecond());
+
+
 
     
     SmartDashboard.putBoolean("Left lim switch", getLeftLimitSwitchVal());

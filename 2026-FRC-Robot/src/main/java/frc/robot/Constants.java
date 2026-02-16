@@ -116,8 +116,8 @@ public final class Constants {
     public static final double KrotationMotorkIzone = 1; 
 
 
-    public static final double KrotationMotorkS = 0.025;// 0.00
-    public static final double KrotationMotorkV = 0.0009; //0.0012
+    public static final double KrotationMotorkS = 0.01;// 0.025
+    public static final double KrotationMotorkV = 0.00122; //0.0009
 
     public static final double Kturretsetpointoffset = 0.2;// pid tolerance
     public static final double KturretBodyOffset = 12; //8.5, offset of flywheel to direction of turret cause deisgner are dumb, degrees

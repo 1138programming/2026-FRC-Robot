@@ -232,6 +232,10 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putBoolean("isUsingVision", isUsingVision);
     SmartDashboard.putString("drive pose estimater", poseEstimator.getEstimatedPosition().toString());
     SmartDashboard.putNumber("base delta angle", getAngularVelocityRadiansPerSecond() * 180/ Math.PI);
+    SmartDashboard.putNumber("base horizontal vel", getHorizontalVelocityMetersPerSecond());
+    SmartDashboard.putNumber("base vertical vel", getVerticalVelocityMetersPerSecond());
+
+
     feild.setRobotPose(getPose());
     SmartDashboard.putData("feild",feild);
     // Update gyro alert

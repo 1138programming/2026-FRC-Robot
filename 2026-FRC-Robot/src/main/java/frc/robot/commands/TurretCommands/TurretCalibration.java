@@ -8,15 +8,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Turret;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurretVelocity extends Command {
-
+public class TurretCalibration extends Command {
+  /** Creates a new TurretCalibration. */
   Turret turret;
-  double speed;
-  /** Creates a new TurrentTracking. */
-  public TurretVelocity(Turret turret, double speed) {
+  public TurretCalibration(Turret turret) {
     this.turret = turret;
-    this.speed = speed;
-    addRequirements(turret);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -26,20 +23,24 @@ public class TurretVelocity extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    turret.rotateRotationMotorAtVelocity(speed);
+    if (!turret.hasLeftReset()) {
+      turret.rotateRotationMotorAtVelocity(-300);
+    }
+    else {
+      turret.rotateRotationMotorAtVelocity(300);
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     turret.stopTurretRotation();
-
-
+    
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return  turret.getLeftLimitSwitchVal() || turret.getRightLimitSwitchVal();//(speed >= 0 && turret.softStopRight()) || (speed <= 0 && turret.softStopLeft());
+    return turret.softStopLeft() || turret.softStopRight();
   }
 }

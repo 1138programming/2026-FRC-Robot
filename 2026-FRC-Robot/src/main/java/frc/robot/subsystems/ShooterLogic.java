@@ -85,7 +85,7 @@ public class ShooterLogic extends SubsystemBase {
 
     //shot change math
     shotChangeDataHub = calculateShotChanges(kHubFieldPose2d);
-
+    SmartDashboard.putNumberArray("shot changes", shotChangeDataHub);
      
 
     //SmartDashboard.putNumber("TX Helper", absoluteAngletoAprilTagLimelightDegrees(0));
@@ -94,7 +94,7 @@ public class ShooterLogic extends SubsystemBase {
     SmartDashboard.putString("diff translation", kHubFieldPose2d.getTranslation().minus(turretPose2d.getTranslation()).toString());
 
     SmartDashboard.putNumber("Distance to Hub Center", distancetoPose2d(kHubFieldPose2d));
-    SmartDashboard.putNumber("Angle to Hub Center", relativeTurretAngletoPos(kHubFieldPose2d));
+    SmartDashboard.putNumber("Angle to Hub Center", relativeTurretAngletoPose2d(kHubFieldPose2d));
 
   }
 
@@ -115,32 +115,30 @@ public class ShooterLogic extends SubsystemBase {
 
     //initial launch components
     double hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(2 * y / x - Math.tan(a))))); //this clamps the hood angle to constraints
-    double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - y)));
+    double flywheelSpeed = Math.sqrt(Math.abs(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - y))));
 
     //robot velocity components -> TODO, check video to see if this matches up
     //double robotVelocity = drive.getchas(); //TODO: probably get the velocity from the IMU, also check units  
     double robotVelocityXComponent = drive.getHorizontalVelocityMetersPerSecond();
     double robotVelocityYComponent = drive.getVerticalVelocityMetersPerSecond();
 
-    //velocity compensation variables
-    double vz = flywheelSpeed * Math.sin(hoodAngle); //velocity of the projectile in z direction (vertical)
-    double time = x / (flywheelSpeed * Math.cos(hoodAngle)); //projectile air time
-    double ivr = x / time + robotVelocityXComponent; //initial radial velocity of of the projectile
-    double nvr = Math.sqrt(ivr * ivr + robotVelocityYComponent * robotVelocityYComponent); //compensating launch velocity using perpendicular moevement 
-    double ndr = nvr * time; //convert to distance
+    // //velocity compensation variables
+    // double vz = flywheelSpeed * Math.sin(hoodAngle); //velocity of the projectile in z direction (vertical)
+    // double time = x / (flywheelSpeed * Math.cos(hoodAngle)); //projectile air time
+    // double ivr = x / time + robotVelocityXComponent; //initial radial velocity of of the projectile
+    // double nvr = Math.sqrt(ivr * ivr + robotVelocityYComponent * robotVelocityYComponent); //compensating launch velocity using perpendicular moevement 
+    // double ndr = nvr * time; //convert to distance
 
-    //final launch components with compensation
-    hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(vz / nvr))));
-    flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math.tan(hoodAngle) - y)));
+    // //final launch components with compensation
+    // hoodAngle = Math.max(kHoodAngleMinRadians, Math.min(kHoodAngleMaxRadians, (Math.atan(vz / nvr))));
+    // flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math.tan(hoodAngle) - y)));
 
-    //updating turret
-    double turretVelCompensation = Math.atan(robotVelocityYComponent / ivr);
-    double turretAngle = turretAngletoPose2d(target) + turretVelCompensation;//TODO check signs especially for turret compensation
+    // //updating turret
+    // double turretVelCompensation = Math.atan(robotVelocityYComponent / ivr);
+    double turretAngle = relativeTurretAngletoPose2d(target);// + turretVelCompensation;//TODO check signs especially for turret compensation
 
   
-    if (turretAngle > Math.toRadians(180)) {
-      turretAngle -= Math.toRadians(360);
-    }
+  
 
     return new double[] {flywheelSpeed, hoodAngle, turretAngle};
   }
@@ -186,9 +184,11 @@ public class ShooterLogic extends SubsystemBase {
 /////////////////
 
   /**
-   * @return relative angle that the turret must be at to face towards a pose
+   * @param pose2d
+   * @return The relative yaw angle of the turret to directly face the Pose2d position (in degrees)
+   * Values range from -180 to 180
    */
-  public double relativeTurretAngletoPos(Pose2d pose) {
+  public double relativeTurretAngletoPose2d(Pose2d pose) {
     double angle = turretAngletoPose2d(pose);
     if(angle > 180) {
       angle -= 360;
@@ -230,7 +230,7 @@ public class ShooterLogic extends SubsystemBase {
    * @return whether the turret is ready to shoot
    */
   public boolean turretTracking(Pose2d pose) {
-    double angle = relativeTurretAngletoPos(pose);
+    double angle = relativeTurretAngletoPose2d(pose);
     double deltaangle = (drive.getAngularVelocityRadiansPerSecond() * 180)/ Math.PI; // change in deg per sec of the base4
     // deltaangle = deltaangle 
 
@@ -248,7 +248,7 @@ public class ShooterLogic extends SubsystemBase {
 
     SmartDashboard.putNumber("turret angle output", angle);
 
-    // turret.rotationMoveToPosition(relativeTurretAngletoPos(pose));
+    // turret.rotationMoveToPosition(relativeTurretAngletoPose2d(pose));
     turret.rotationMoveToPosition(angle,0);
     return readyToShoot;
   }
@@ -274,7 +274,7 @@ public class ShooterLogic extends SubsystemBase {
     }
 
     SmartDashboard.putNumber("turret angle output", angle);
-    // turret.rotationMoveToPosition(relativeTurretAngletoPos(pose));
+    // turret.rotationMoveToPosition(relativeTurretAngletoPose2d(pose));
     turret.rotationMoveToPosition(angle,0);
     return readyToShoot;
     
@@ -318,7 +318,7 @@ public class ShooterLogic extends SubsystemBase {
   /**
    * 
    * @param pose2d
-   * @return The yaw angle of the turret to directly face the Pose2d position
+   * @return The absolute yaw angle of the turret to directly face the Pose2d position (in degrees)
    */
   private double turretAngletoPose2d(Pose2d pose2d) {
     Translation2d difftranslation = pose2d.getTranslation().minus(turretPose2d.getTranslation());

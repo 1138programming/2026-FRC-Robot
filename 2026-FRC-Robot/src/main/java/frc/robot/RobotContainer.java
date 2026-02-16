@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import frc.robot.commands.TurretCommands.TurretCalibration;
 import frc.robot.Constants.LimelightConstants;
 //drive
 import frc.robot.commands.DriveCommands;
@@ -80,6 +81,7 @@ public class RobotContainer {
   public final TurretSetRotation turretresetRot; 
   public final TurretRotate m_Turret_Rotate_Backward;
   public final TurretVelocity m_Turret_Rotate_Velocity;
+  public final TurretCalibration m_TurretCalibration;
   public final TurretMatchDrive m_turretMatchDrive;
   public final TurretAutoAim m_Turret_Auto_Aim;
   public final toggleLaser lasertoggle;
@@ -171,7 +173,8 @@ public class RobotContainer {
     m_Turret_Tracking = new TurretTracking(m_Turret);
     m_Turret_Rotate_Forward = new TurretRotate(m_Turret, -0.1);
     m_Turret_Rotate_Backward = new TurretRotate(m_Turret, 0.1);
-    m_Turret_Rotate_Velocity = new TurretVelocity(m_Turret, 50);
+    m_Turret_Rotate_Velocity = new TurretVelocity(m_Turret, -50);
+    m_TurretCalibration = new TurretCalibration(m_Turret);
     turretresetRot = new TurretSetRotation(m_Turret, 0);
     m_SetSpeed = new FlyWheelSetSpeed(m_Turret, -0.65);
 
