@@ -6,6 +6,8 @@ package frc.robot.commands.TurretCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.*;
+
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.ShooterLogic;
 import frc.robot.subsystems.Turret;
 
@@ -27,14 +29,14 @@ public class TurretAutoAim extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    turret.restrotationmotorpid();
+    turret.turretResetrotationmotorpid();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     // atpos = turret.rotationMoveToPosition(logic.relativeTurretAngletoPos(FieldConstants.HubConstants.red.kHubFieldPose2d) + TurretConstants.KturretFlywheelOffset); 
-    logic.turretTracking(FieldConstants.HubConstants.red.kHubFieldPose2d);
+    logic.turretTrackPose(FieldConstants.HubConstants.red.kHubFieldPose2d);
   }
 
   // Called once the command ends or is interrupted. 67

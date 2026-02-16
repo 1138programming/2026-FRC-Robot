@@ -229,13 +229,13 @@ public class ShooterLogic extends SubsystemBase {
    * Tracks the given feild position
    * @return whether the turret is ready to shoot
    */
-  public boolean turretTracking(Pose2d pose) {
+  public boolean turretTrackPose(Pose2d pose) {
     double angle = relativeTurretAngletoPose2d(pose);
     double deltaangle = (drive.getAngularVelocityRadiansPerSecond() * 180)/ Math.PI; // change in deg per sec of the base4
     // deltaangle = deltaangle 
 
     angle -= TurretConstants.KturretBodyOffset;
-    readyToShoot = turret.rotationmotorpidatsetpoint();
+    readyToShoot = turret.turretRotationmotorpidatsetpoint();
 
     if (angle > KrotationMotorRightLim + Kturretsetpointoffset) {
       angle = KrotationMotorRightLim;
@@ -259,10 +259,10 @@ public class ShooterLogic extends SubsystemBase {
     return;
   }
 
-  public boolean turretTracking(double angle) {
+  public boolean turretTrackAngle(double angle) {
     angle = TurretAnglefromabsolute(angle);
     angle -= TurretConstants.KturretBodyOffset;
-    readyToShoot = turret.rotationmotorpidatsetpoint();
+    readyToShoot = turret.turretRotationmotorpidatsetpoint();
 
         if (angle > KrotationMotorRightLim + Kturretsetpointoffset) {
       angle = KrotationMotorRightLim;

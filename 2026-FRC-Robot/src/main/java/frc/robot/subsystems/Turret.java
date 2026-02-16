@@ -293,12 +293,18 @@ public class Turret extends SubsystemBase {
     return rotationMotorPID.atSetpoint();
   }
 
-  public void restrotationmotorpid() {
+    /**
+   *  Resets the previous error and integral terms of the turret PID
+   */
+  public void turretResetrotationmotorpid() {
     rotationMotorPID.reset();
   }
 
-  
-  public boolean rotationmotorpidatsetpoint() {
+  /**
+   * 
+   * @return wether the turret rotation is with the setpoint +/- the tolerance of the PID
+   */
+  public boolean turretRotationmotorpidatsetpoint() {
     return rotationMotorPID.atSetpoint();
   }
 
