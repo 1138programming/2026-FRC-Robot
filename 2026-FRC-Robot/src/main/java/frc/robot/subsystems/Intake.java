@@ -12,29 +12,28 @@ import static frc.robot.Constants.intakeConstants.*;
 
 
 public class Intake extends SubsystemBase{
-    private SparkFlex intakeMotorReel;
-    private TalonFX armMotor;
+    private SparkFlex intakeMotor;
+    private TalonFX intakeDeployMotor;
 
   public Intake() {
-      intakeMotorReel = new SparkFlex(KIntakeMotorReelId, MotorType.kBrushless);
-      armMotor = new TalonFX(KArmMotorID);
+      intakeMotor = new SparkFlex(KintakeMotorId, MotorType.kBrushless);
+      intakeDeployMotor = new TalonFX(KintakeDeployMotorId);
     }
 
-    //Reel
-    public void reelIntake(double power) {
-      intakeMotorReel.set(power);
+    public void setIntakePowwer(double power) {
+      intakeMotor.set(power);
     }
 
-    public void reelArm(double power) {
-      armMotor.set(power);
+    public void setIntakeDeployMotorPower(double power) {
+      intakeDeployMotor.set(power);
     }
 
-    public void intakReelStop() {
-      intakeMotorReel.set(0);
+    public void stopIntakeMotor() {
+      intakeMotor.set(0);
     }
 
-    public void armReelStop() {
-      armMotor.set(0);
+    public void stopIntakeDeployMotor() {
+      intakeDeployMotor.set(0);
     }
 
 

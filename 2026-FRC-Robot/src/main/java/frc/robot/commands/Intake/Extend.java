@@ -7,7 +7,7 @@ package frc.robot.commands.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 import static frc.robot.Constants.*;
-import static frc.robot.Constants.intakeConstants.KArmMotorReelSpeed;
+import static frc.robot.Constants.intakeConstants.KintakeDeployMotorSpeed;
 
 public class Extend extends Command {
 
@@ -25,13 +25,13 @@ public class Extend extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.reelArm(KArmMotorReelSpeed);
+    intake.setIntakeDeployMotorPower(KintakeDeployMotorSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.armReelStop();
+    intake.stopIntakeDeployMotor();
   }
 
   // Returns true when the command should end.

@@ -137,11 +137,11 @@ public final class Constants {
 
   public static class intakeConstants {
     //change
-    public static final int KIntakeMotorReelId = 67;
-    public static final double KIntakeMotorReelSpeed = 0.67;
+    public static final int KintakeMotorId = 67;
+    public static final double KintakeMotorSpeed = 0.67;
     
-    public static final int KArmMotorID = 0;
-    public static final double KArmMotorReelSpeed = 0.0;
+    public static final int KintakeDeployMotorId = 0;
+    public static final double KintakeDeployMotorSpeed = 0.0;
   }
   
 
