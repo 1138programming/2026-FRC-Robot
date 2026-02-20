@@ -6,8 +6,7 @@ package frc.robot.commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
-import static frc.robot.Constants.*;
-import static frc.robot.Constants.intakeConstants.KintakeDeployMotorSpeed;
+import static frc.robot.Constants.intakeConstants.*;
 
 public class Extend extends Command {
 
