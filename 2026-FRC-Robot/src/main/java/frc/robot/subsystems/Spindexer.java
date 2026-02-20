@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import static frc.robot.Constants.SpindexerConstants.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,46 +11,33 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Spindexer extends SubsystemBase{
     TalonFX rotationMotor;
-    TalonFX indexerMotor;
-
-    DigitalInput leftLimSwitch;
-    DigitalInput rightLimSwitch;
+    SparkMax indexerMotor;
 
     public Spindexer(){
         rotationMotor = new TalonFX(KRotationMotorID);
-        indexerMotor = new TalonFX(KIndexMotorID);
-
-        leftLimSwitch = new DigitalInput(KleftLimSwitchID);
-        rightLimSwitch = new DigitalInput(KrightLimSwitchID);
+        indexerMotor = new SparkMax(KIndexMotorID, MotorType.kBrushless);
     }
 
-    public boolean getLeftLimTriggered(){
-        return leftLimSwitch.get();
-    }
-
-    public boolean getRightLimTriggered(){
-        return rightLimSwitch.get();
-    }
 
     public void setRotationMotorPower(double power){
         rotationMotor.set(power);
     }
 
-    public void setIndexerPower(double power){
-        if (getLeftLimTriggered() && getRightLimTriggered()){
-            indexerMotor.set(power);
-            return;
-        }
+
+    public void setIndexerMotorPower(double power){
+        indexerMotor.set(power);
     }
 
-    public void setRotationMotor(double power){
-        rotationMotor.set(power);
+    public void stopRotationMotor(){
+        rotationMotor.set(0);
+    }
+    
+    public void stopIndexerMotor(){
+        indexerMotor.set(0);
     }
     
 
     @Override
     public void periodic(){
-        SmartDashboard.putBoolean("left lim", getLeftLimTriggered());
-        SmartDashboard.putBoolean("right lim", getRightLimTriggered());
     }
 }
