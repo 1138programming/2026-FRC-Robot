@@ -18,6 +18,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Servo;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -41,6 +43,9 @@ public class Turret extends SubsystemBase {
 
   private CANcoder turretRotationCANcoder;
   private CANcoder hoodPitchCANcoder;
+
+  private Servo hoodServo;
+
   private CANcoderConfiguration rotationCANcoderConfig; 
   private PIDController rotationMotorPID;
   private SimpleMotorFeedforward rotationMotorFeedforward;
@@ -61,6 +66,7 @@ public class Turret extends SubsystemBase {
     
     // constructors
     hoodMotor = new TalonFX(KhoodMotorID);
+    hoodServo = new Servo(KhoodPort);
     flywheelMotor = new SparkFlex(19,MotorType.kBrushless);
 
     // Flywheel PID
@@ -75,7 +81,6 @@ public class Turret extends SubsystemBase {
     //constructors
 
     rotationMotor = new SparkMax(KrotationMotorID, MotorType.kBrushless);
-    hoodMotor = new TalonFX(KhoodMotorID);
     // flywheelMotor = new TalonFX(KflywheelMotorID);
     // flywheelMotor.getConfigurator().apply(flywheelConfig);
 
@@ -193,12 +198,14 @@ public class Turret extends SubsystemBase {
   public void rotateHoodMotor(double power) {
     double hoodDegree = getHoodDegree();
     // outside limits
-    if (hoodDegree >= KhoodMotorRightLim && hoodDegree <= KhoodMotorLeftLim) {
-      hoodMotor.set(0.0);
+    if (hoodDegree >= KhoodMaxAngle && hoodDegree <= KhoodMinAngle) {
+      hoodServo.setSpeed(0.0);
+      //hoodMotor.set(0.0);
       return;
     }
 
-    hoodMotor.set(power);
+    hoodServo.setSpeed(power);
+    //hoodMotor.set(power);
   }
 
   public void resetRotationDegree(double deg) {
@@ -237,7 +244,8 @@ public class Turret extends SubsystemBase {
   }
 
   public double getHoodDegree() {
-    return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - KhoodMotorOffset) * 360;
+    return hoodServo.getAngle() - khoodServoOffset;
+    //return (hoodPitchCANcoder.getAbsolutePosition().getValueAsDouble() - KhoodMotorOffset) * 360;
   }
 
 
@@ -252,7 +260,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void stopHood() {
-    hoodMotor.set(0.0);
+    hoodServo.setSpeed(0.0);
   }
 
   public void stopAll() {
@@ -309,10 +317,13 @@ public class Turret extends SubsystemBase {
   }
 
   public void hoodMoveToPosition(double degrees) {
-    double hoodDegree = getHoodDegree();
-    if (hoodDegree >= KhoodMotorRightLim && hoodDegree <= KhoodMotorLeftLim) {
-      rotateHoodMotor(hoodMotorPID.calculate(getHoodDegree(), degrees));
-    }
+    //double hoodDegree = getHoodDegree();
+    // if (hoodDegree >= KhoodMotorRightLim && hoodDegree <= KhoodMotorLeftLim) {
+    //   rotateHoodMotor(hoodMotorPID.calculate(getHoodDegree(), degrees));
+    // }
+
+
+    hoodMotor.set(Math.max(Math.min(degrees, KhoodMinAngle), KhoodMaxAngle));
   }
 
   @Override

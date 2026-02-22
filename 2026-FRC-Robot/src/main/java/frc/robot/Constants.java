@@ -138,6 +138,7 @@ public final class Constants {
     public static final double KflywheelMotorD = 0.1;
 
     public static final double KhoodMotorOffset = 0.0;
+    public static final double khoodServoOffset = 0.0;
     public static final double KrotationMotorOffset = 0.0;
 
 
@@ -148,12 +149,13 @@ public final class Constants {
     public static final double KrotationMotorRightMagnetRot = 140; //137deg pos of CANcoder at right magent switch 138-1
 
 
-    public static final double KhoodMotorRightLim = 90.0;
-    public static final double KhoodMotorLeftLim = 0.0;
+    public static final double KhoodMaxAngle = 70.0;
+    public static final double KhoodMinAngle = 20.0;
 
     public static final int KrotationMotorID = 2;
     public static final int KhoodMotorID = 10;
     public static final int KflywheelMotorID = 9;
+    public static final int KhoodPort = 0; // PWM port for hood servo, PLACEHOLDER 
 
 
     public static final int KturretRotationCANcoderID = 5;
