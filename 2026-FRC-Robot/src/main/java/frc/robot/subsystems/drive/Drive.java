@@ -115,6 +115,7 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
   private Field2d feild = new Field2d();
+  private int periodicCounter = 0; // For debug print throttling
 
   public Drive(
       GyroIO gyroIO,
@@ -229,18 +230,27 @@ public class Drive extends SubsystemBase {
 
     limelight.updateOreintation(poseEstimator.getEstimatedPosition().getRotation().getDegrees());
     boolean isUsingVision = updateOdometryWithMT2();
-    SmartDashboard.putBoolean("isUsingVision", isUsingVision);
-    SmartDashboard.putString("drive pose estimater", poseEstimator.getEstimatedPosition().toString());
-    SmartDashboard.putNumber("base delta angle", getAngularVelocityRadiansPerSecond() * 180/ Math.PI);
-    SmartDashboard.putNumber("base horizontal vel", getHorizontalVelocityMetersPerSecond());
-    SmartDashboard.putNumber("base vertical vel", getVerticalVelocityMetersPerSecond());
+    // SmartDashboard calls removed to prevent loop overruns - use AdvantageKit Logger instead
+    // SmartDashboard.putBoolean("isUsingVision", isUsingVision);
+    // SmartDashboard.putString("drive pose estimater", poseEstimator.getEstimatedPosition().toString());
+    // SmartDashboard.putNumber("base delta angle", getAngularVelocityRadiansPerSecond() * 180/ Math.PI);
+    // SmartDashboard.putNumber("base horizontal vel", getHorizontalVelocityMetersPerSecond());
+    // SmartDashboard.putNumber("base vertical vel", getVerticalVelocityMetersPerSecond());
 
+    // DEBUG: Print actual achieved velocities (every cycle when driving)
+    ChassisSpeeds actualSpeeds = getChassisSpeeds();
+    double actualSpeed = Math.hypot(actualSpeeds.vxMetersPerSecond, actualSpeeds.vyMetersPerSecond);
+    if (actualSpeed > 0.1) { // Print when moving
+      double batteryVolts = edu.wpi.first.wpilibj.RobotController.getBatteryVoltage();
+      System.out.println("ACTUAL Speed: " + String.format("%.2f", actualSpeed) + " m/s, " +
+                       "Battery: " + String.format("%.2f", batteryVolts) + "V");
+    }
 
     feild.setRobotPose(getPose());
-    SmartDashboard.putData("feild",feild);
+    // SmartDashboard.putData("feild",feild); // REMOVED - causes loop overruns
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
-    SmartDashboard.putNumber("meters to center hub", distanetoCenterHub());
+    // SmartDashboard.putNumber("meters to center hub", distanetoCenterHub()); // REMOVED - causes loop overruns
 
 
   }

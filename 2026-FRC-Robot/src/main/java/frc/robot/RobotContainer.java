@@ -399,21 +399,21 @@ public class RobotContainer {
   
   public double getLogiRightYAxis() {
     final double Y = logitech.getRawAxis(KRightYAxis);
-    SmartDashboard.putNumber("getLogiRightYAxis", -Y);
+    // SmartDashboard.putNumber("getLogiRightYAxis", -Y); // REMOVED - causes loop overruns
     if (Y > KDeadZone || Y < -KDeadZone) return -Y;
     else return 0;
   }
 
   public double getLogiLeftYAxis() {
     final double Y = logitech.getY();
-    SmartDashboard.putNumber("getLogiLeftYAxis", -Y);
+    // SmartDashboard.putNumber("getLogiLeftYAxis", -Y); // REMOVED - causes loop overruns
     if (Y > KDeadZone || Y < -KDeadZone) return -Y;
     else return 0;
   }
 
   public double getLogiRightXAxis() {
     double X = logitech.getZ();
-    SmartDashboard.putNumber("getLogiRightXAxis", -X);
+    // SmartDashboard.putNumber("getLogiRightXAxis", -X); // REMOVED - causes loop overruns
     if (X > KDeadZone || X < -KDeadZone) {
       return -X;
     } else {
@@ -423,7 +423,7 @@ public class RobotContainer {
 
   public double getLogiLeftXAxis() {
     double X = logitech.getX();
-    SmartDashboard.putNumber("getLogiLeftXAxis", -X);
+    // SmartDashboard.putNumber("getLogiLeftXAxis", -X); // REMOVED - causes loop overruns
     if (X > KDeadZone || X < -KDeadZone) {
 
       return -X;

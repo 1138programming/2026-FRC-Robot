@@ -54,7 +54,7 @@ public class DriveCommands {
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
-    // Square magnitude for more precise control
+    // Square magnitude for more precise control at low speeds
     linearMagnitude = linearMagnitude * linearMagnitude;
 
     // Return new linear velocity
@@ -74,21 +74,44 @@ public class DriveCommands {
     return Commands.run(
         () -> {
           // Get linear velocity
+          double xInput = xSupplier.getAsDouble();
+          double yInput = ySupplier.getAsDouble();
           Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              getLinearVelocityFromJoysticks(xInput, yInput);
+
+          // DEBUG: Print joystick inputs
+          double joystickMag = Math.hypot(xInput, yInput);
+          if (joystickMag > 0.5) { // Only print when actually driving
+            System.out.println("Joystick: X=" + String.format("%.2f", xInput) +
+                             ", Y=" + String.format("%.2f", yInput) +
+                             ", Mag=" + String.format("%.2f", joystickMag));
+          }
 
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-          // Square rotation value for more precise control
+          // Square rotation value for more precise control at low speeds
           omega = Math.copySign(omega * omega, omega);
+
+          // BANDAID FIX: Removed - fixed kV in TunerConstants instead
+          double linearSpeedMultiplier = 1.0; // Back to normal now that kV is correct
+          double rotationMultiplier = 1.0;
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() * linearSpeedMultiplier,
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * linearSpeedMultiplier,
+                  omega * drive.getMaxAngularSpeedRadPerSec() * rotationMultiplier);
+
+          // DEBUG: Print commanded velocities
+          double commandedSpeed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+          if (commandedSpeed > 0.5) { // Only print when actually driving
+            System.out.println("CMD Speed: " + String.format("%.2f", commandedSpeed) + " m/s, " +
+                             "MaxSpeed: " + String.format("%.2f", drive.getMaxLinearSpeedMetersPerSec()) + " m/s, " +
+                             "Multiplier: " + linearSpeedMultiplier + "x");
+          }
+
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
